@@ -45,8 +45,8 @@ const About = () => {
   return (
     <div className="min-h-screen bg-white">
       <Helmet>
-        <title>About Us - Packwell Plastic Industries</title>
-        <meta name="description" content="Learn about Packwell Plastic Industries - a leading manufacturer of high-quality plastic products with 25+ years of experience." />
+        <title>About Us - Blow Pack Plastic Industries</title>
+        <meta name="description" content="Learn about Blow Pack Plastic Industries - a leading manufacturer of high-quality plastic products with 25+ years of experience." />
       </Helmet>
 
       {/* Hero Section */}
@@ -54,7 +54,7 @@ const About = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              About Packwell Plastic
+              About Blow Pack Plastic
             </h1>
             <p className="text-xl md:text-2xl text-primary-100 max-w-3xl mx-auto">
               Leading the plastic industry with innovation, quality, and customer satisfaction for over 25 years

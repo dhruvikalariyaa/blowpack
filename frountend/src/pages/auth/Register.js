@@ -40,8 +40,25 @@ const Register = () => {
   }, [dispatch]);
 
   const onSubmit = (data) => {
+    console.log('Form submitted with data:', data);
     dispatch(registerUser(data));
   };
+
+  // Test backend connection
+  const testBackend = async () => {
+    try {
+      const response = await fetch('/api/auth/test');
+      const data = await response.json();
+      console.log('Backend test response:', data);
+    } catch (error) {
+      console.error('Backend test failed:', error);
+    }
+  };
+
+  // Test on component mount
+  useEffect(() => {
+    testBackend();
+  }, []);
 
   if (loading) {
     return <LoadingSpinner size="xl" className="min-h-screen" />;
@@ -50,13 +67,20 @@ const Register = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <Helmet>
-        <title>Register - Packwell Plastic Industries</title>
-        <meta name="description" content="Create your Packwell Plastic account to start shopping for premium plastic products." />
+        <title>Register - Blow Pack Plastic Industries</title>
+        <meta name="description" content="Create your Blow Pack Plastic account to start shopping for premium plastic products." />
       </Helmet>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-primary-600">Packwell Plastic</h1>
+          <div className="flex items-center justify-center space-x-3 mb-4">
+            <img 
+              src="/logo.png" 
+              alt="Blow Pack Plastic" 
+              className="h-12 w-auto"
+            />
+            <h1 className="text-3xl font-bold text-primary-600">Blow Pack Plastic</h1>
+          </div>
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
             Create your account
           </h2>

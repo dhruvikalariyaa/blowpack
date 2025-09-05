@@ -70,8 +70,8 @@ const Contact = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Helmet>
-        <title>Contact Us - Packwell Plastic Industries</title>
-        <meta name="description" content="Get in touch with Packwell Plastic Industries. We're here to help with all your plastic product needs." />
+        <title>Contact Us - Blow Pack Plastic Industries</title>
+        <meta name="description" content="Get in touch with Blow Pack Plastic Industries. We're here to help with all your plastic product needs." />
       </Helmet>
 
       {/* Hero Section */}
@@ -79,7 +79,7 @@ const Contact = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Contact Us
+              Contact Blow Pack Plastic
             </h1>
             <p className="text-xl text-primary-100 max-w-3xl mx-auto">
               We'd love to hear from you. Send us a message and we'll respond as soon as possible.

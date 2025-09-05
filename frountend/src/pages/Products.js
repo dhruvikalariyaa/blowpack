@@ -90,7 +90,7 @@ const Products = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Helmet>
-        <title>Products - Packwell Plastic Industries</title>
+        <title>Products - Blow Pack Plastic Industries</title>
         <meta name="description" content="Browse our complete collection of high-quality plastic products including bottles, containers, and custom solutions." />
       </Helmet>
 

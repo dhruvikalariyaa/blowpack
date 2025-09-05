@@ -19,10 +19,19 @@ export const registerUser = createAsyncThunk(
   'auth/registerUser',
   async (userData, { rejectWithValue }) => {
     try {
+      console.log('Sending registration request:', userData);
       const response = await axios.post('/api/auth/register', userData);
-      localStorage.setItem('token', response.data.data.token);
-      return response.data.data;
+      console.log('Registration response:', response.data);
+      
+      if (response.data.success && response.data.data) {
+        localStorage.setItem('token', response.data.data.token);
+        return response.data.data;
+      } else {
+        return rejectWithValue(response.data.message || 'Registration failed');
+      }
     } catch (error) {
+      console.error('Registration error:', error);
+      console.error('Error response:', error.response?.data);
       return rejectWithValue(error.response?.data?.message || 'Registration failed');
     }
   }

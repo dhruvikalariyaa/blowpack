@@ -57,7 +57,7 @@ const Home = () => {
   return (
     <div className="min-h-screen">
       <Helmet>
-        <title>Packwell Plastic Industries - Premium Plastic Products</title>
+        <title>Blow Pack Plastic Industries - Premium Plastic Products</title>
         <meta name="description" content="Discover our wide range of high-quality plastic products including bottles, containers, and custom solutions for all your needs." />
       </Helmet>
 

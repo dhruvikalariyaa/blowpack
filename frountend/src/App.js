@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet-async';
 import { toast } from 'react-toastify';
@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import LoadingSpinner from './components/common/LoadingSpinner';
+import AdminRoute from './components/common/AdminRoute';
 
 // Pages
 import Home from './pages/Home';
@@ -43,7 +44,11 @@ import { clearError, clearSuccess } from './store/slices/authSlice';
 
 function App() {
   const dispatch = useDispatch();
-  const { isAuthenticated, loading, error, success } = useSelector((state) => state.auth);
+  const location = useLocation();
+  const { isAuthenticated, loading, error, success, user } = useSelector((state) => state.auth);
+  
+  // Check if current route is an admin route
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   // Initialize app
   useEffect(() => {
@@ -84,7 +89,8 @@ function App() {
         <meta name="description" content="Discover our wide range of high-quality plastic products including bottles, containers, and custom solutions for all your needs." />
       </Helmet>
 
-      <Navbar />
+      {/* Only show main navbar if not on admin routes */}
+      {!isAdminRoute && <Navbar />}
       
       <main className="min-h-screen">
         <Routes>
@@ -110,19 +116,20 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           
           {/* Admin Routes */}
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/products" element={<AdminProducts />} />
-          <Route path="/admin/orders" element={<AdminOrders />} />
-          <Route path="/admin/categories" element={<AdminCategories />} />
-          <Route path="/admin/users" element={<AdminUsers />} />
-          <Route path="/admin/reviews" element={<AdminReviews />} />
+          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          <Route path="/admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
+          <Route path="/admin/orders" element={<AdminRoute><AdminOrders /></AdminRoute>} />
+          <Route path="/admin/categories" element={<AdminRoute><AdminCategories /></AdminRoute>} />
+          <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+          <Route path="/admin/reviews" element={<AdminRoute><AdminReviews /></AdminRoute>} />
           
           {/* 404 Route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
 
-      <Footer />
+      {/* Only show footer if not on admin routes */}
+      {!isAdminRoute && <Footer />}
     </div>
   );
 }
