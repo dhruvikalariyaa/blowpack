@@ -16,7 +16,14 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
-            <h3 className="text-2xl font-bold text-primary-400">Packwell Plastic</h3>
+            <div className="flex items-center space-x-3">
+              <img 
+                src="/logo.png" 
+                alt="Blow Pack Plastic" 
+                className="h-8 w-auto"
+              />
+              <h3 className="text-2xl font-bold text-primary-400">Blow Pack Plastic</h3>
+            </div>
             <p className="text-gray-300 text-sm leading-relaxed">
               Leading manufacturer of high-quality plastic products. We provide innovative 
               solutions for all your plastic needs with unmatched quality and service.
@@ -147,7 +154,7 @@ const Footer = () => {
         <div className="mt-8 pt-8 border-t border-gray-800">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="flex items-center space-x-1 text-gray-400 text-sm">
-              <span>© {currentYear} Packwell Plastic Industries. All rights reserved.</span>
+              <span>© {currentYear} Blow Pack Plastic Industries. All rights reserved.</span>
             </div>
             <div className="flex items-center space-x-6 text-sm">
               <a href="#" className="text-gray-400 hover:text-primary-400 transition-colors">

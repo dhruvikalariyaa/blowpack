@@ -75,7 +75,7 @@ const Cart = () => {
     return (
       <div className="min-h-screen bg-gray-50">
         <Helmet>
-          <title>Your Cart - Packwell Plastic Industries</title>
+          <title>Your Cart - Blow Pack Plastic Industries</title>
         </Helmet>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

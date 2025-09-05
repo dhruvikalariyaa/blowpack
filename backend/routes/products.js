@@ -3,7 +3,7 @@ const multer = require('multer');
 const Product = require('../models/Product');
 const Category = require('../models/Category');
 const { authenticateToken, requireAdmin, optionalAuth } = require('../middleware/auth');
-const { validateProduct, validatePagination } = require('../middleware/validation');
+const { validatePagination, validateProduct } = require('../middleware/validation');
 const { uploadImage, uploadMultipleImages, deleteImage } = require('../utils/cloudinary');
 
 const router = express.Router();
@@ -23,6 +23,7 @@ const upload = multer({
     }
   }
 });
+
 
 // @route   GET /api/products
 // @desc    Get all products with filtering and pagination
@@ -208,17 +209,49 @@ router.get('/:id', async (req, res) => {
 // @route   POST /api/products
 // @desc    Create new product
 // @access  Private (Admin only)
-router.post('/', authenticateToken, requireAdmin, validateProduct, async (req, res) => {
+router.post('/', authenticateToken, requireAdmin, upload.array('images', 5), validateProduct, async (req, res) => {
   try {
-    const productData = req.body;
+    // Convert FormData string values to proper types
+    const productData = {
+      name: req.body.name || '',
+      description: req.body.description || '',
+      price: parseFloat(req.body.price) || 0,
+      stock: parseInt(req.body.stock) || 0,
+      category: req.body.category || '',
+      sku: req.body.sku || '',
+      isActive: req.body.isActive === 'true',
+      isFeatured: req.body.isFeatured === 'true'
+    };
 
-    // Verify category exists
-    const category = await Category.findById(productData.category);
-    if (!category) {
-      return res.status(400).json({
-        success: false,
-        message: 'Category not found'
-      });
+
+    // Handle image uploads if provided
+    if (req.files && req.files.length > 0) {
+      try {
+        // Upload images to Cloudinary
+        const uploadResults = await uploadMultipleImages(req.files, 'packwell/products');
+
+        if (!uploadResults.success) {
+          return res.status(500).json({
+            success: false,
+            message: 'Image upload failed',
+            error: uploadResults.error
+          });
+        }
+
+        // Add uploaded images to product data
+        productData.images = uploadResults.uploaded.map(result => ({
+          public_id: result.public_id,
+          url: result.url,
+          alt: `Product image for ${productData.name}`
+        }));
+      } catch (uploadError) {
+        console.error('Image upload error:', uploadError);
+        return res.status(500).json({
+          success: false,
+          message: 'Image upload failed',
+          error: uploadError.message
+        });
+      }
     }
 
     const product = new Product(productData);
@@ -247,7 +280,7 @@ router.post('/', authenticateToken, requireAdmin, validateProduct, async (req, r
 // @route   PUT /api/products/:id
 // @desc    Update product
 // @access  Private (Admin only)
-router.put('/:id', authenticateToken, requireAdmin, validateProduct, async (req, res) => {
+router.put('/:id', authenticateToken, requireAdmin, upload.array('images', 5), validateProduct, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
 
@@ -258,20 +291,56 @@ router.put('/:id', authenticateToken, requireAdmin, validateProduct, async (req,
       });
     }
 
-    // Verify category exists if being updated
-    if (req.body.category) {
-      const category = await Category.findById(req.body.category);
-      if (!category) {
-        return res.status(400).json({
+    // Convert FormData string values to proper types
+    const updateData = {
+      ...req.body,
+      ...(req.body.price && { price: parseFloat(req.body.price) || 0 }),
+      ...(req.body.stock && { stock: parseInt(req.body.stock) || 0 }),
+      ...(req.body.isActive !== undefined && { isActive: req.body.isActive === 'true' }),
+      ...(req.body.isFeatured !== undefined && { isFeatured: req.body.isFeatured === 'true' })
+    };
+
+    // Handle image uploads if provided
+    if (req.files && req.files.length > 0) {
+      try {
+        // Upload new images to Cloudinary
+        const uploadResults = await uploadMultipleImages(req.files, 'packwell/products');
+
+        if (!uploadResults.success) {
+          return res.status(500).json({
+            success: false,
+            message: 'Image upload failed',
+            error: uploadResults.error
+          });
+        }
+
+        // Add new images to existing images
+        const newImages = uploadResults.uploaded.map(result => ({
+          public_id: result.public_id,
+          url: result.url,
+          alt: `Product image for ${updateData.name || product.name}`
+        }));
+
+        // If images are being replaced, use new images only
+        // If images are being added, append to existing images
+        if (updateData.replaceImages === 'true') {
+          updateData.images = newImages;
+        } else {
+          updateData.images = [...(product.images || []), ...newImages];
+        }
+      } catch (uploadError) {
+        console.error('Image upload error:', uploadError);
+        return res.status(500).json({
           success: false,
-          message: 'Category not found'
+          message: 'Image upload failed',
+          error: uploadError.message
         });
       }
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updateData,
       { new: true, runValidators: true }
     ).populate('category', 'name slug');
 
@@ -450,7 +519,7 @@ router.put('/:id/status', authenticateToken, requireAdmin, async (req, res) => {
     const product = await Product.findByIdAndUpdate(
       req.params.id,
       { isActive },
-      { new: true, runValidators: true }
+      { new: true, runValidators: false }
     ).populate('category', 'name slug');
 
     if (!product) {
@@ -487,7 +556,7 @@ router.put('/:id/featured', authenticateToken, requireAdmin, async (req, res) =>
     const product = await Product.findByIdAndUpdate(
       req.params.id,
       { isFeatured },
-      { new: true, runValidators: true }
+      { new: true, runValidators: false }
     ).populate('category', 'name slug');
 
     if (!product) {

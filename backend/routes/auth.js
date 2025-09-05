@@ -9,12 +9,26 @@ const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
 
+// Test endpoint
+router.get('/test', (req, res) => {
+  res.json({ 
+    success: true, 
+    message: 'Auth route is working',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // @route   POST /api/auth/register
 // @desc    Register a new user
 // @access  Public
 router.post('/register', validateUserRegistration, async (req, res) => {
   try {
+    console.log('Registration request received');
+    console.log('JWT_SECRET exists:', !!process.env.JWT_SECRET);
+    console.log('JWT_EXPIRE:', process.env.JWT_EXPIRE);
+    
     const { name, email, phone, password } = req.body;
+    console.log('Request data:', { name, email, phone, password: '***' });
 
     // Check if user already exists
     const existingUser = await User.findOne({
@@ -28,42 +42,64 @@ router.post('/register', validateUserRegistration, async (req, res) => {
       });
     }
 
+    // Generate email verification token
+    const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+    const emailVerificationExpire = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+
     // Create user
+    console.log('Creating new user');
     const user = new User({
       name,
       email,
       phone,
-      password
+      password,
+      emailVerificationToken,
+      emailVerificationExpire
     });
 
+    console.log('Saving user to database');
     await user.save();
+    console.log('User saved successfully with ID:', user._id);
 
-    // Generate email verification token
-    const emailVerificationToken = crypto.randomBytes(32).toString('hex');
-    user.emailVerificationToken = emailVerificationToken;
-    user.emailVerificationExpire = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
-    await user.save();
-
-    // Send welcome email
-    const emailResult = await sendEmail(
-      user.email,
-      emailTemplates.welcome(user.name).subject,
-      emailTemplates.welcome(user.name).html
-    );
+    // Send welcome email (don't fail registration if email fails)
+    try {
+      const emailResult = await sendEmail(
+        user.email,
+        emailTemplates.welcome(user.name).subject,
+        emailTemplates.welcome(user.name).html
+      );
+      if (!emailResult.success) {
+        console.warn('Welcome email failed to send:', emailResult.error);
+      }
+    } catch (emailError) {
+      console.warn('Welcome email failed to send:', emailError.message);
+      // Don't fail registration if email fails
+    }
 
     // Generate JWT token
+    console.log('Generating JWT token for user:', user._id);
     const token = generateToken({ id: user._id, role: user.role });
+    console.log('JWT token generated successfully');
 
-    res.status(201).json({
+    console.log('Getting public profile for user');
+    const publicProfile = user.getPublicProfile();
+    console.log('Public profile generated successfully');
+
+    console.log('Sending success response');
+    const responseData = {
       success: true,
       message: 'User registered successfully',
       data: {
-        user: user.getPublicProfile(),
+        user: publicProfile,
         token
       }
-    });
+    };
+    console.log('Response data:', JSON.stringify(responseData, null, 2));
+    
+    res.status(201).json(responseData);
   } catch (error) {
     console.error('Registration error:', error);
+    console.error('Error stack:', error.stack);
     res.status(500).json({
       success: false,
       message: 'Registration failed',

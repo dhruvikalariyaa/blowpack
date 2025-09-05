@@ -49,13 +49,20 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <Helmet>
-        <title>Login - Packwell Plastic Industries</title>
-        <meta name="description" content="Login to your Packwell Plastic account to access your orders, wishlist, and more." />
+        <title>Login - Blow Pack Plastic Industries</title>
+        <meta name="description" content="Login to your Blow Pack Plastic account to access your orders, wishlist, and more." />
       </Helmet>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-primary-600">Packwell Plastic</h1>
+          <div className="flex items-center justify-center space-x-3 mb-4">
+            <img 
+              src="/logo.png" 
+              alt="Blow Pack Plastic" 
+              className="h-12 w-auto"
+            />
+            <h1 className="text-3xl font-bold text-primary-600">Blow Pack Plastic</h1>
+          </div>
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
             Sign in to your account
           </h2>

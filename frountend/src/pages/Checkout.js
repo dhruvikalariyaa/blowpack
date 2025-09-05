@@ -5,7 +5,7 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Helmet>
-        <title>Checkout - Packwell Plastic Industries</title>
+        <title>Checkout - Blow Pack Plastic Industries</title>
       </Helmet>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center">
