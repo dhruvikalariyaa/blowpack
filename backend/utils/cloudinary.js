@@ -1,3 +1,6 @@
+// Load environment variables first
+require('dotenv').config();
+
 const cloudinary = require('cloudinary').v2;
 
 // Configure Cloudinary
@@ -7,15 +10,32 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+// Cloudinary configuration loaded successfully
+
 // Upload image to Cloudinary
 const uploadImage = async (file, folder = 'packwell') => {
   try {
-    const result = await cloudinary.uploader.upload(file, {
+    // Handle both file paths (string) and Buffer objects from multer memory storage
+    const uploadOptions = {
       folder: folder,
       resource_type: 'auto',
       quality: 'auto',
       fetch_format: 'auto'
-    });
+    };
+
+    let result;
+    if (typeof file === 'string') {
+      // File path string
+      result = await cloudinary.uploader.upload(file, uploadOptions);
+    } else if (Buffer.isBuffer(file)) {
+      // Buffer from multer memory storage
+      result = await cloudinary.uploader.upload(`data:${file.mimetype || 'image/jpeg'};base64,${file.toString('base64')}`, uploadOptions);
+    } else if (file.buffer) {
+      // Multer file object with buffer
+      result = await cloudinary.uploader.upload(`data:${file.mimetype || 'image/jpeg'};base64,${file.buffer.toString('base64')}`, uploadOptions);
+    } else {
+      throw new Error('Invalid file type. Expected string path, Buffer, or multer file object.');
+    }
     
     return {
       success: true,
@@ -43,7 +63,7 @@ const uploadMultipleImages = async (files, folder = 'packwell') => {
     const failed = results.filter(result => !result.success);
     
     return {
-      success: true,
+      success: successful.length > 0,
       uploaded: successful,
       failed: failed
     };

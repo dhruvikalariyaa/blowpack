@@ -18,12 +18,19 @@ import Button from '../components/common/Button';
 const Home = () => {
   const dispatch = useDispatch();
   const { featuredProducts, loading: productsLoading } = useSelector((state) => state.products);
-  const { categories, loading: categoriesLoading } = useSelector((state) => state.categories);
+  const { categories, loading: categoriesLoading, isRateLimited, lastFetched } = useSelector((state) => state.categories);
 
   useEffect(() => {
     dispatch(fetchFeaturedProducts({ limit: 8 }));
-    dispatch(fetchCategories());
-  }, [dispatch]);
+    
+    // Only fetch categories if we don't have them, not rate limited, and haven't fetched recently
+    const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
+    
+    if (categories.length === 0 && !isRateLimited && (!lastFetched || lastFetched < fiveMinutesAgo)) {
+      dispatch(fetchCategories());
+    }
+  }, [dispatch, categories.length, isRateLimited, lastFetched]);
+
 
   const features = [
     {
@@ -189,7 +196,7 @@ const Home = () => {
               <div key={product._id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 group">
                 <div className="aspect-w-1 aspect-h-1 bg-gray-200">
                   <img
-                    src={product.images?.[0]?.url || '/placeholder-product.jpg'}
+                    src={product.images?.[0]?.url || '/placeholder-product.svg'}
                     alt={product.name}
                     className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                   />

@@ -147,6 +147,15 @@ const validateCategory = [
 
 // Review validation rules
 const validateReview = [
+  body('productId')
+    .isMongoId()
+    .withMessage('Valid product ID is required'),
+  
+  body('orderId')
+    .optional()
+    .isMongoId()
+    .withMessage('Valid order ID is required'),
+  
   body('rating')
     .isInt({ min: 1, max: 5 })
     .withMessage('Rating must be between 1 and 5'),

@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { 
   MagnifyingGlassIcon, 
   FunnelIcon, 
   XMarkIcon,
   StarIcon,
   HeartIcon,
-  ShoppingCartIcon
+  ShoppingCartIcon,
+  ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import { 
   fetchProducts, 
@@ -25,6 +26,7 @@ import { toast } from 'react-toastify';
 
 const Products = () => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const { 
     products, 
     categories, 
@@ -36,10 +38,14 @@ const Products = () => {
 
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState(filters.search || '');
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     dispatch(fetchProducts(filters));
   }, [dispatch, filters]);
+
+  // Only refresh when filters change
+  // No automatic refresh - only manual refresh button
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -85,6 +91,17 @@ const Products = () => {
 
   const handlePageChange = (page) => {
     dispatch(setFilters({ page }));
+  };
+
+  const handleRefresh = async () => {
+    console.log('Manual refresh triggered');
+    setIsRefreshing(true);
+    try {
+      await dispatch(fetchProducts(filters));
+      toast.success('Products refreshed');
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   return (
@@ -256,9 +273,23 @@ const Products = () => {
               <>
                 {/* Results Header */}
                 <div className="flex items-center justify-between mb-6">
-                  <p className="text-gray-600">
-                    Showing {pagination.totalItems} products
-                  </p>
+                  <div className="flex items-center space-x-4">
+                    <p className="text-gray-600">
+                      Showing {pagination.totalItems} products
+                    </p>
+                    <button
+                      onClick={handleRefresh}
+                      disabled={isRefreshing}
+                      className={`flex items-center space-x-1 text-sm font-medium ${
+                        isRefreshing 
+                          ? 'text-gray-400 cursor-not-allowed' 
+                          : 'text-primary-600 hover:text-primary-700'
+                      }`}
+                    >
+                      <ArrowPathIcon className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                      <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
+                    </button>
+                  </div>
                   <div className="text-sm text-gray-500">
                     Page {pagination.currentPage} of {pagination.totalPages}
                   </div>
@@ -270,7 +301,7 @@ const Products = () => {
                     <div key={product._id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 group">
                       <div className="aspect-w-1 aspect-h-1 bg-gray-200 relative">
                         <img
-                          src={product.images?.[0]?.url || '/placeholder-product.jpg'}
+                          src={product.images?.[0]?.url || '/placeholder-product.svg'}
                           alt={product.name}
                           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                         />

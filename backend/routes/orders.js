@@ -18,13 +18,29 @@ router.post('/', authenticateToken, validateOrder, async (req, res) => {
 
     // Get user's cart
     const cart = await Cart.findOne({ user: req.user._id })
-      .populate('items.product', 'name price images stock');
+      .populate('items.product', 'name price images stock isActive');
 
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({
         success: false,
         message: 'Cart is empty'
       });
+    }
+
+    // Remove inactive products from cart before processing order
+    const activeItems = cart.items.filter(item => item.product && item.product.isActive);
+    
+    if (activeItems.length !== cart.items.length) {
+      console.log('🧹 Removing inactive products from cart before order creation');
+      cart.items = activeItems;
+      await cart.save();
+      
+      if (cart.items.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'No active products in cart'
+        });
+      }
     }
 
     // Validate items and calculate totals
@@ -34,8 +50,17 @@ router.post('/', authenticateToken, validateOrder, async (req, res) => {
     for (const cartItem of cart.items) {
       const product = cartItem.product;
       
+      // Debug logging
+      console.log('🔍 Order validation for product:', {
+        name: product.name,
+        isActive: product.isActive,
+        stock: product.stock,
+        cartQuantity: cartItem.quantity
+      });
+      
       // Check if product is still available
       if (!product.isActive) {
+        console.log('❌ Product is inactive:', product.name);
         return res.status(400).json({
           success: false,
           message: `Product "${product.name}" is no longer available`
@@ -78,7 +103,19 @@ router.post('/', authenticateToken, validateOrder, async (req, res) => {
       notes
     });
 
+    console.log('📦 Creating order...', {
+      user: req.user._id,
+      itemsCount: orderItems.length,
+      totalAmount
+    });
+
     await order.save();
+    
+    console.log('✅ Order created successfully:', {
+      orderId: order._id,
+      orderNumber: order.orderNumber,
+      totalAmount: order.totalAmount
+    });
 
     // Update product stock
     for (const cartItem of cart.items) {
@@ -92,17 +129,32 @@ router.post('/', authenticateToken, validateOrder, async (req, res) => {
     cart.items = [];
     await cart.save();
 
-    // Send order confirmation email
+    // Send order confirmation email to customer
     const user = await User.findById(req.user._id);
+    console.log('📧 Sending customer email to:', user.email);
+    
     const emailResult = await sendEmail(
       user.email,
       emailTemplates.orderConfirmation(order.orderNumber, user.name, orderItems, totalAmount).subject,
       emailTemplates.orderConfirmation(order.orderNumber, user.name, orderItems, totalAmount).html
     );
 
+    // Send order notification email to company
+    const adminEmail = process.env.COMPANY_EMAIL || process.env.EMAIL_USER;
+    console.log('📧 Sending admin email to:', adminEmail);
+    
+    const companyEmailResult = await sendEmail(
+      adminEmail,
+      `New Order Received - ${order.orderNumber}`,
+      emailTemplates.newOrderNotification(order, user, orderItems).html
+    );
+
+    console.log('📧 Customer email sent:', emailResult.success, emailResult.error ? `- ${emailResult.error}` : '');
+    console.log('📧 Company email sent:', companyEmailResult.success, companyEmailResult.error ? `- ${companyEmailResult.error}` : '');
+
     // Populate order for response
     const populatedOrder = await Order.findById(order._id)
-      .populate('items.product', 'name price images');
+      .populate('items.product', 'name price images isActive');
 
     res.status(201).json({
       success: true,
@@ -177,7 +229,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
     const order = await Order.findOne({
       _id: req.params.id,
       user: req.user._id
-    }).populate('items.product', 'name price images description');
+    }).populate('items.product', 'name price images description isActive');
 
     if (!order) {
       return res.status(404).json({
@@ -332,8 +384,15 @@ router.put('/:id/status', authenticateToken, requireAdmin, async (req, res) => {
       });
     }
 
-    const validStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
+    const validStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'completed', 'cancelled'];
+    console.log('🔍 Validating order status:', {
+      requestedStatus: orderStatus,
+      validStatuses: validStatuses,
+      isValid: validStatuses.includes(orderStatus)
+    });
+    
     if (!validStatuses.includes(orderStatus)) {
+      console.log('❌ Invalid order status:', orderStatus);
       return res.status(400).json({
         success: false,
         message: 'Invalid order status'
@@ -341,7 +400,7 @@ router.put('/:id/status', authenticateToken, requireAdmin, async (req, res) => {
     }
 
     const order = await Order.findById(req.params.id)
-      .populate('user', 'name email');
+      .populate('user', 'name email phone');
 
     if (!order) {
       return res.status(404).json({
@@ -349,6 +408,15 @@ router.put('/:id/status', authenticateToken, requireAdmin, async (req, res) => {
         message: 'Order not found'
       });
     }
+
+    console.log('🔄 Updating order status:', {
+      orderId: order._id,
+      orderNumber: order.orderNumber,
+      oldStatus: order.orderStatus,
+      newStatus: orderStatus,
+      customerEmail: order.user?.email,
+      customerName: order.user?.name
+    });
 
     const oldStatus = order.orderStatus;
     order.orderStatus = orderStatus;
@@ -361,6 +429,8 @@ router.put('/:id/status', authenticateToken, requireAdmin, async (req, res) => {
       }
     } else if (orderStatus === 'delivered') {
       order.deliveredAt = new Date();
+    } else if (orderStatus === 'completed') {
+      order.completedAt = new Date();
     } else if (orderStatus === 'cancelled') {
       order.cancelledAt = new Date();
       order.cancellationReason = req.body.cancellationReason || 'Cancelled by admin';
@@ -376,20 +446,62 @@ router.put('/:id/status', authenticateToken, requireAdmin, async (req, res) => {
 
     await order.save();
 
-    // Send email notification
-    if (orderStatus === 'shipped' && order.trackingNumber) {
-      await sendEmail(
+    // Send email notification to customer
+    console.log(`📧 Sending status update email to customer: ${order.user.email} for status: ${orderStatus}`);
+    
+    if (orderStatus === 'confirmed') {
+      const emailResult = await sendEmail(
+        order.user.email,
+        emailTemplates.orderConfirmed(order.orderNumber, order.user.name).subject,
+        emailTemplates.orderConfirmed(order.orderNumber, order.user.name).html
+      );
+      console.log('📧 Order confirmed email sent:', emailResult.success, emailResult.error ? `- ${emailResult.error}` : '');
+    } else if (orderStatus === 'processing') {
+      const emailResult = await sendEmail(
+        order.user.email,
+        emailTemplates.orderProcessing(order.orderNumber, order.user.name).subject,
+        emailTemplates.orderProcessing(order.orderNumber, order.user.name).html
+      );
+      console.log('📧 Order processing email sent:', emailResult.success, emailResult.error ? `- ${emailResult.error}` : '');
+    } else if (orderStatus === 'shipped' && order.trackingNumber) {
+      const emailResult = await sendEmail(
         order.user.email,
         emailTemplates.orderShipped(order.orderNumber, order.user.name, order.trackingNumber).subject,
         emailTemplates.orderShipped(order.orderNumber, order.user.name, order.trackingNumber).html
       );
+      console.log('📧 Order shipped email sent:', emailResult.success, emailResult.error ? `- ${emailResult.error}` : '');
     } else if (orderStatus === 'delivered') {
-      await sendEmail(
+      const emailResult = await sendEmail(
         order.user.email,
         emailTemplates.orderDelivered(order.orderNumber, order.user.name).subject,
         emailTemplates.orderDelivered(order.orderNumber, order.user.name).html
       );
+      console.log('📧 Order delivered email sent:', emailResult.success, emailResult.error ? `- ${emailResult.error}` : '');
+    } else if (orderStatus === 'completed') {
+      // Send completion email to customer
+      const emailResult = await sendEmail(
+        order.user.email,
+        emailTemplates.orderCompleted(order.orderNumber, order.user.name).subject,
+        emailTemplates.orderCompleted(order.orderNumber, order.user.name).html
+      );
+      console.log('📧 Order completed email sent:', emailResult.success, emailResult.error ? `- ${emailResult.error}` : '');
+
+      // Send completion notification email to company/admin
+      const companyEmailResult = await sendEmail(
+        process.env.COMPANY_EMAIL || process.env.EMAIL_USER,
+        `Order Completed - ${order.orderNumber}`,
+        emailTemplates.orderCompletedNotification(order, order.user, order.items).html
+      );
+      console.log('📧 Order completion notification sent to company:', companyEmailResult.success, companyEmailResult.error ? `- ${companyEmailResult.error}` : '');
+    } else if (orderStatus === 'cancelled') {
+      const emailResult = await sendEmail(
+        order.user.email,
+        emailTemplates.orderCancelled(order.orderNumber, order.user.name, order.cancellationReason).subject,
+        emailTemplates.orderCancelled(order.orderNumber, order.user.name, order.cancellationReason).html
+      );
+      console.log('📧 Order cancelled email sent:', emailResult.success, emailResult.error ? `- ${emailResult.error}` : '');
     }
+
 
     res.json({
       success: true,

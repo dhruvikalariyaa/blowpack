@@ -4,7 +4,7 @@ const orderSchema = new mongoose.Schema({
   orderNumber: {
     type: String,
     unique: true,
-    required: true
+    required: false
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -62,7 +62,7 @@ const orderSchema = new mongoose.Schema({
   },
   orderStatus: {
     type: String,
-    enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'],
+    enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'completed', 'cancelled'],
     default: 'pending'
   },
   paymentStatus: {
@@ -102,6 +102,9 @@ const orderSchema = new mongoose.Schema({
     type: Date
   },
   deliveredAt: {
+    type: Date
+  },
+  completedAt: {
     type: Date
   },
   cancelledAt: {

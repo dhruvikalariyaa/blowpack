@@ -211,6 +211,13 @@ router.get('/:id', async (req, res) => {
 // @access  Private (Admin only)
 router.post('/', authenticateToken, requireAdmin, upload.array('images', 5), validateProduct, async (req, res) => {
   try {
+    console.log('🔄 Creating new product...');
+    console.log('Request body:', req.body);
+    console.log('Request files:', req.files ? req.files.length : 0, 'files');
+    if (req.files && req.files.length > 0) {
+      console.log('File details:', req.files.map(f => ({ name: f.originalname, size: f.size, mimetype: f.mimetype })));
+    }
+    
     // Convert FormData string values to proper types
     const productData = {
       name: req.body.name || '',
@@ -282,6 +289,13 @@ router.post('/', authenticateToken, requireAdmin, upload.array('images', 5), val
 // @access  Private (Admin only)
 router.put('/:id', authenticateToken, requireAdmin, upload.array('images', 5), validateProduct, async (req, res) => {
   try {
+    console.log('🔄 Updating product:', req.params.id);
+    console.log('Request body:', req.body);
+    console.log('Request files:', req.files ? req.files.length : 0, 'files');
+    if (req.files && req.files.length > 0) {
+      console.log('File details:', req.files.map(f => ({ name: f.originalname, size: f.size, mimetype: f.mimetype })));
+    }
+    
     const product = await Product.findById(req.params.id);
 
     if (!product) {
@@ -336,6 +350,13 @@ router.put('/:id', authenticateToken, requireAdmin, upload.array('images', 5), v
           error: uploadError.message
         });
       }
+    } else {
+      // No new images provided, preserve existing images
+      // Only update images if explicitly told to clear them
+      if (updateData.clearImages === 'true') {
+        updateData.images = [];
+      }
+      // If no clearImages flag, existing images are preserved by not setting updateData.images
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(

@@ -16,6 +16,7 @@ import { fetchCategories } from '../../store/slices/categorySlice';
 import { fetchProducts, setFilters } from '../../store/slices/productSlice';
 import Button from '../common/Button';
 import LoadingSpinner from '../common/LoadingSpinner';
+import RateLimitAlert from '../common/RateLimitAlert';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -28,12 +29,17 @@ const Navbar = () => {
   const { isAuthenticated, user, loading } = useSelector((state) => state.auth);
   const { count: cartCount } = useSelector((state) => state.cart);
   const { count: wishlistCount } = useSelector((state) => state.wishlist);
-  const { categories } = useSelector((state) => state.categories);
+  const { categories, isRateLimited, lastFetched, retryAfter } = useSelector((state) => state.categories);
 
-  // Load categories on component mount
+  // Load categories on component mount (only if not already loaded or rate limited)
   React.useEffect(() => {
-    dispatch(fetchCategories());
-  }, [dispatch]);
+    // Only fetch if we don't have categories, not rate limited, and haven't fetched recently (within 5 minutes)
+    const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
+    
+    if (categories.length === 0 && !isRateLimited && (!lastFetched || lastFetched < fiveMinutesAgo)) {
+      dispatch(fetchCategories());
+    }
+  }, [dispatch, categories.length, isRateLimited, lastFetched]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -60,8 +66,18 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white shadow-lg sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <>
+      {/* Rate Limit Alert */}
+      {isRateLimited && (
+        <div className="bg-yellow-50 border-b border-yellow-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+            <RateLimitAlert retryAfter={retryAfter} />
+          </div>
+        </div>
+      )}
+      
+      <nav className="bg-white shadow-lg sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center">
@@ -198,6 +214,13 @@ const Navbar = () => {
                     >
                       Orders
                     </Link>
+                    <Link
+                      to="/reviews"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    >
+                      My Reviews
+                    </Link>
                     {user?.role === 'admin' && (
                       <Link
                         to="/admin"
@@ -306,6 +329,7 @@ const Navbar = () => {
         </div>
       )}
     </nav>
+    </>
   );
 };
 
