@@ -27,6 +27,7 @@ import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
+import GoogleSuccess from './pages/auth/GoogleSuccess';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import NotFound from './pages/NotFound';
@@ -110,6 +111,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/auth/google-success" element={<GoogleSuccess />} />
             
             {/* Protected Routes */}
             <Route path="/cart" element={<Cart />} />

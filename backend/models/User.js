@@ -17,14 +17,28 @@ const userSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    required: [true, 'Phone number is required'],
+    required: function() {
+      return this.provider === 'local'; // Phone is required only for local registration
+    },
     match: [/^[6-9]\d{9}$/, 'Please enter a valid 10-digit phone number']
   },
   password: {
     type: String,
-    required: [true, 'Password is required'],
+    required: function() {
+      return !this.googleId; // Password is required only if not using Google OAuth
+    },
     minlength: [6, 'Password must be at least 6 characters'],
     select: false
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true // Allows multiple null values
+  },
+  provider: {
+    type: String,
+    enum: ['local', 'google'],
+    default: 'local'
   },
   role: {
     type: String,

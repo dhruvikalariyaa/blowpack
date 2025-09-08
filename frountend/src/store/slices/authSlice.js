@@ -111,6 +111,27 @@ export const resetPassword = createAsyncThunk(
   }
 );
 
+export const googleAuth = createAsyncThunk(
+  'auth/googleAuth',
+  async (googleData, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('/api/auth/google-token', {
+        token: googleData.credential,
+        userInfo: googleData.userInfo
+      });
+      
+      if (response.data.success && response.data.data.token) {
+        localStorage.setItem('token', response.data.data.token);
+        return response.data.data;
+      } else {
+        return rejectWithValue(response.data.message || 'Google authentication failed');
+      }
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Google authentication failed');
+    }
+  }
+);
+
 const initialState = {
   user: null,
   token: localStorage.getItem('token'),
@@ -236,6 +257,22 @@ const authSlice = createSlice({
         state.success = action.payload.message;
       })
       .addCase(resetPassword.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Google Auth
+      .addCase(googleAuth.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(googleAuth.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        state.error = null;
+      })
+      .addCase(googleAuth.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
