@@ -108,18 +108,19 @@ const Wishlist = () => {
                 <img
                   src={product.images?.[0]?.url || '/placeholder-product.svg'}
                   alt={product.name}
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-48 object-cover"
                 />
-                <div className="absolute top-2 right-2 flex flex-col space-y-2">
+                <div className="absolute top-2 left-2">
                   <button
                     onClick={() => handleRemoveFromWishlist(product._id)}
-                    className="p-2 bg-white/80 hover:bg-white rounded-full shadow-sm transition-colors"
+                    className="p-2 bg-white/90 hover:bg-white rounded-full shadow-md hover:shadow-lg transition-all duration-200 group"
+                    title="Remove from wishlist"
                   >
-                    <TrashIcon className="h-4 w-4 text-gray-600 hover:text-red-500" />
+                    <TrashIcon className="h-4 w-4 text-gray-600 group-hover:text-red-500 transition-colors" />
                   </button>
                 </div>
                 {product.isFeatured && (
-                  <div className="absolute top-2 left-2">
+                  <div className="absolute top-2 right-2">
                     <span className="bg-primary-600 text-white text-xs px-2 py-1 rounded-full">
                       Featured
                     </span>
@@ -162,9 +163,6 @@ const Wishlist = () => {
                       </span>
                     )}
                   </div>
-                  <span className="text-sm text-gray-500">
-                    {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
-                  </span>
                 </div>
                 <div className="flex space-x-2">
                   <Link
@@ -175,7 +173,6 @@ const Wishlist = () => {
                   </Link>
                   <button
                     onClick={() => handleAddToCart(product._id)}
-                    disabled={product.stock === 0}
                     className="px-4 py-2 bg-primary-600 text-white hover:bg-primary-700 disabled:bg-gray-300 disabled:cursor-not-allowed rounded-md transition-colors text-sm font-medium"
                   >
                     <ShoppingCartIcon className="h-4 w-4" />
@@ -186,7 +183,6 @@ const Wishlist = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => handleMoveToCart(product._id)}
-                    disabled={product.stock === 0}
                     className="w-full"
                   >
                     Move to Cart

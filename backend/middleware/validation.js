@@ -106,13 +106,6 @@ const validateProduct = [
     .isLength({ min: 3, max: 100 })
     .withMessage('Product name must be between 3 and 100 characters'),
   
-  body('description')
-    .trim()
-    .notEmpty()
-    .withMessage('Product description is required')
-    .isLength({ min: 10, max: 1000 })
-    .withMessage('Description must be between 10 and 1000 characters'),
-  
   body('price')
     .isFloat({ min: 0 })
     .withMessage('Price must be a positive number'),
@@ -120,10 +113,6 @@ const validateProduct = [
   body('category')
     .isMongoId()
     .withMessage('Valid category ID is required'),
-  
-  body('stock')
-    .isInt({ min: 0 })
-    .withMessage('Stock must be a non-negative integer'),
   
   handleValidationErrors
 ];
