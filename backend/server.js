@@ -4,7 +4,11 @@ const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
+const passport = require('passport');
 require('dotenv').config();
+
+// Import passport configuration
+require('./config/passport');
 
 const app = express();
 
@@ -42,6 +46,9 @@ app.use(cors({
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Passport middleware
+app.use(passport.initialize());
 
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/packwell_plastic', {

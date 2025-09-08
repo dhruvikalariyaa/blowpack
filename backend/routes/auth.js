@@ -1,6 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const passport = require('passport');
 const User = require('../models/User');
 const { generateToken } = require('../utils/jwt');
 const { sendEmail, emailTemplates } = require('../utils/email');
@@ -320,6 +321,121 @@ router.post('/change-password', authenticateToken, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Password change failed',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
+});
+
+// @route   GET /api/auth/google
+// @desc    Google OAuth login
+// @access  Public
+router.get('/google', passport.authenticate('google', {
+  scope: ['profile', 'email']
+}));
+
+// @route   GET /api/auth/google/callback
+// @desc    Google OAuth callback
+// @access  Public
+router.get('/google/callback', 
+  passport.authenticate('google', { session: false }),
+  async (req, res) => {
+    try {
+      const user = req.user;
+      
+      // Generate JWT token
+      const token = generateToken({ id: user._id, role: user.role });
+      
+      // Redirect to frontend with token
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      res.redirect(`${frontendUrl}/auth/google-success?token=${token}`);
+    } catch (error) {
+      console.error('Google OAuth callback error:', error);
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      res.redirect(`${frontendUrl}/login?error=google_auth_failed`);
+    }
+  }
+);
+
+// @route   POST /api/auth/google-token
+// @desc    Handle Google OAuth token from frontend
+// @access  Public
+router.post('/google-token', async (req, res) => {
+  try {
+    const { token, userInfo } = req.body;
+    
+    if (!token || !userInfo) {
+      return res.status(400).json({
+        success: false,
+        message: 'Google token and user info are required'
+      });
+    }
+
+    // Check if user already exists with this Google ID
+    let user = await User.findOne({ googleId: userInfo.googleId });
+    
+    if (user) {
+      // User exists, generate JWT token
+      const jwtToken = generateToken({ id: user._id, role: user.role });
+      
+      return res.json({
+        success: true,
+        message: 'Google authentication successful',
+        data: {
+          user: user.getPublicProfile(),
+          token: jwtToken
+        }
+      });
+    }
+    
+    // Check if user exists with same email
+    user = await User.findOne({ email: userInfo.email });
+    
+    if (user) {
+      // User exists with email but no Google ID, link the accounts
+      user.googleId = userInfo.googleId;
+      user.provider = 'google';
+      user.emailVerified = true;
+      await user.save();
+      
+      const jwtToken = generateToken({ id: user._id, role: user.role });
+      
+      return res.json({
+        success: true,
+        message: 'Google authentication successful',
+        data: {
+          user: user.getPublicProfile(),
+          token: jwtToken
+        }
+      });
+    }
+    
+    // Create new user
+    user = new User({
+      googleId: userInfo.googleId,
+      name: userInfo.name,
+      email: userInfo.email,
+      provider: 'google',
+      emailVerified: true,
+      isActive: true
+    });
+    
+    await user.save();
+    
+    const jwtToken = generateToken({ id: user._id, role: user.role });
+    
+    res.json({
+      success: true,
+      message: 'Google authentication successful',
+      data: {
+        user: user.getPublicProfile(),
+        token: jwtToken
+      }
+    });
+  } catch (error) {
+    console.error('Google token error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Google authentication failed',
       error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
     });
   }
