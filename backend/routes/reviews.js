@@ -72,7 +72,16 @@ router.post('/', authenticateToken, validateReview, async (req, res) => {
       isVerified: true // Verified since it's from a delivered order
     });
 
+    console.log('Creating review with data:', {
+      user: req.user._id,
+      product: productId,
+      rating,
+      title,
+      comment
+    });
+
     await review.save();
+    console.log('Review saved successfully with ID:', review._id);
 
     // Update product ratings
     await updateProductRatings(productId);
@@ -106,6 +115,15 @@ router.post('/', authenticateToken, validateReview, async (req, res) => {
 router.get('/product/:productId', validatePagination, async (req, res) => {
   try {
     const { productId } = req.params;
+    
+    // Validate productId
+    if (!productId || productId === 'undefined' || productId === 'null') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid product ID'
+      });
+    }
+
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
@@ -444,20 +462,65 @@ router.put('/:id/approve', authenticateToken, requireAdmin, async (req, res) => 
 // Helper function to update product ratings
 async function updateProductRatings(productId) {
   try {
+    console.log('Updating product ratings for:', productId);
+    
     const stats = await Review.aggregate([
       { $match: { product: productId, isApproved: true } },
       { $group: { _id: null, average: { $avg: '$rating' }, count: { $sum: 1 } } }
     ]);
 
-    if (stats.length > 0) {
-      await Product.findByIdAndUpdate(productId, {
-        'ratings.average': Math.round(stats[0].average * 10) / 10,
-        'ratings.count': stats[0].count
-      });
+    console.log('Rating stats:', stats);
+
+    let newAverage = 0;
+    let newCount = 0;
+
+    if (stats.length > 0 && stats[0].count > 0) {
+      newAverage = Math.round(stats[0].average * 10) / 10;
+      newCount = stats[0].count;
+      console.log(`Updating product ${productId} to: ${newAverage} stars (${newCount} reviews)`);
+    } else {
+      console.log('No approved reviews found, setting to 0');
     }
+    
+    // Always update the product, even if no reviews
+    await Product.findByIdAndUpdate(productId, {
+      'ratings.average': newAverage,
+      'ratings.count': newCount
+    });
+    
+    console.log('Product ratings updated successfully');
   } catch (error) {
     console.error('Update product ratings error:', error);
   }
 }
+
+// @route   POST /api/reviews/update-all-ratings
+// @desc    Update ratings for all products (admin only)
+// @access  Private/Admin
+router.post('/update-all-ratings', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    console.log('Updating ratings for all products...');
+    
+    const products = await Product.find({});
+    let updatedCount = 0;
+    
+    for (const product of products) {
+      await updateProductRatings(product._id);
+      updatedCount++;
+    }
+    
+    res.json({
+      success: true,
+      message: `Updated ratings for ${updatedCount} products`
+    });
+  } catch (error) {
+    console.error('Update all ratings error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update ratings',
+      error: error.message
+    });
+  }
+});
 
 module.exports = router;

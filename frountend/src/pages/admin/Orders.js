@@ -60,6 +60,8 @@ const AdminOrders = () => {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
+      console.log(`🔄 Updating order ${orderId} to status: ${newStatus}`);
+      
       const token = localStorage.getItem('token');
       const response = await fetch(`/api/orders/${orderId}/status`, {
         method: 'PUT',
@@ -71,12 +73,21 @@ const AdminOrders = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update order status');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update order status');
       }
 
+      const result = await response.json();
+      console.log('✅ Order status updated successfully:', result);
+      
+      // Show success message
+      alert(`Order status updated to ${newStatus} successfully! Email notification sent to customer.`);
+      
       fetchOrders();
     } catch (err) {
+      console.error('❌ Error updating order status:', err);
       setError(err.message);
+      alert(`Error updating order status: ${err.message}`);
     }
   };
 
@@ -86,10 +97,14 @@ const AdminOrders = () => {
         return 'bg-yellow-100 text-yellow-800';
       case 'confirmed':
         return 'bg-blue-100 text-blue-800';
+      case 'processing':
+        return 'bg-indigo-100 text-indigo-800';
       case 'shipped':
         return 'bg-purple-100 text-purple-800';
       case 'delivered':
         return 'bg-green-100 text-green-800';
+      case 'completed':
+        return 'bg-emerald-100 text-emerald-800';
       case 'cancelled':
         return 'bg-red-100 text-red-800';
       default:
@@ -300,6 +315,16 @@ const AdminOrders = () => {
                         
                         {order.orderStatus === 'confirmed' && (
                           <button
+                            onClick={() => updateOrderStatus(order._id, 'processing')}
+                            className="text-blue-600 hover:text-blue-900"
+                            title="Mark as Processing"
+                          >
+                            <CheckIcon className="h-4 w-4" />
+                          </button>
+                        )}
+                        
+                        {order.orderStatus === 'processing' && (
+                          <button
                             onClick={() => updateOrderStatus(order._id, 'shipped')}
                             className="text-purple-600 hover:text-purple-900"
                             title="Mark as Shipped"
@@ -315,6 +340,32 @@ const AdminOrders = () => {
                             title="Mark as Delivered"
                           >
                             <CheckIcon className="h-4 w-4" />
+                          </button>
+                        )}
+                        
+                        {order.orderStatus === 'delivered' && (
+                          <button
+                            onClick={() => updateOrderStatus(order._id, 'completed')}
+                            className="bg-emerald-600 text-white hover:bg-emerald-700 px-3 py-1 rounded-md text-sm font-medium"
+                            title="Mark as Completed"
+                          >
+                            ✓ Complete
+                          </button>
+                        )}
+                        
+                        {/* Debug: Show current status */}
+                        <span style={{fontSize: '10px', color: '#666', marginLeft: '5px'}}>
+                          ({order.orderStatus})
+                        </span>
+                        
+                        {/* Fallback: Show complete button for any non-final status */}
+                        {!['completed', 'cancelled'].includes(order.orderStatus) && order.orderStatus !== 'delivered' && (
+                          <button
+                            onClick={() => updateOrderStatus(order._id, 'completed')}
+                            className="bg-gray-600 text-white hover:bg-gray-700 px-2 py-1 rounded text-xs"
+                            title="Mark as Completed (Fallback)"
+                          >
+                            Complete
                           </button>
                         )}
                         

@@ -135,11 +135,16 @@ const AdminProducts = () => {
       formDataToSend.append("isFeatured", formData.isFeatured.toString());
 
       // Add images if any
+      console.log('🖼️ Form images:', formData.images);
       if (formData.images && formData.images.length > 0) {
         const newImages = formData.images.filter(img => img.isNew && img.file);
+        console.log('📤 New images to upload:', newImages.length);
         newImages.forEach(image => {
+          console.log('📎 Appending image:', image.file.name, image.file.size, image.file.type);
           formDataToSend.append("images", image.file);
         });
+      } else {
+        console.log('❌ No images to upload');
       }
 
       const response = await fetch(url, {

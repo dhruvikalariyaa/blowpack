@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const User = require('../models/User');
 require('dotenv').config();
 
+
 const seedAdmin = async () => {
   try {
     // Connect to MongoDB

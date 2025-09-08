@@ -106,7 +106,7 @@ const Wishlist = () => {
             <div key={product._id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 group">
               <div className="aspect-w-1 aspect-h-1 bg-gray-200 relative">
                 <img
-                  src={product.images?.[0]?.url || '/placeholder-product.jpg'}
+                  src={product.images?.[0]?.url || '/placeholder-product.svg'}
                   alt={product.name}
                   className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
