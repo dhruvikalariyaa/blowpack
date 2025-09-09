@@ -59,13 +59,13 @@ const validateUserLogin = [
 
 const validateAddress = [
   body('name')
+    .optional()
     .trim()
-    .notEmpty()
-    .withMessage('Name is required')
     .isLength({ min: 2, max: 50 })
     .withMessage('Name must be between 2 and 50 characters'),
   
   body('phone')
+    .optional()
     .matches(/^[6-9]\d{9}$/)
     .withMessage('Please provide a valid 10-digit phone number'),
   

@@ -1,9 +1,29 @@
 const express = require('express');
+const multer = require('multer');
 const User = require('../models/User');
 const { authenticateToken } = require('../middleware/auth');
 const { validateAddress } = require('../middleware/validation');
+const { uploadImage, deleteImage } = require('../utils/cloudinary');
 
 const router = express.Router();
+
+// Configure multer for memory storage
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 2 * 1024 * 1024, // 2MB limit for compressed images
+    fieldSize: 2 * 1024 * 1024, // 2MB field size limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Check if file is an image
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  }
+});
 
 // @route   GET /api/users/profile
 // @desc    Get user profile
@@ -71,6 +91,118 @@ router.put('/profile', authenticateToken, async (req, res) => {
   }
 });
 
+// @route   POST /api/users/profile/image
+// @desc    Upload profile image
+// @access  Private
+router.post('/profile/image', authenticateToken, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No image file provided'
+      });
+    }
+
+    // Get current user to check for existing profile image
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Delete old profile image if exists
+    if (user.profileImage && user.profileImage.public_id) {
+      await deleteImage(user.profileImage.public_id);
+    }
+
+    // Convert buffer to base64 for Cloudinary
+    const base64 = req.file.buffer.toString('base64');
+    const dataURI = `data:${req.file.mimetype};base64,${base64}`;
+
+    // Upload new image to Cloudinary
+    const result = await uploadImage(dataURI, 'packwell/profiles');
+
+    if (!result.success) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to upload image',
+        error: result.error
+      });
+    }
+
+    // Update user with new profile image
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        profileImage: {
+          public_id: result.public_id,
+          url: result.url
+        }
+      },
+      { new: true }
+    );
+
+    res.json({
+      success: true,
+      message: 'Profile image uploaded successfully',
+      data: {
+        user: updatedUser.getPublicProfile()
+      }
+    });
+  } catch (error) {
+    console.error('Profile image upload error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Profile image upload failed',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
+});
+
+// @route   DELETE /api/users/profile/image
+// @desc    Delete profile image
+// @access  Private
+router.delete('/profile/image', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Delete image from Cloudinary if exists
+    if (user.profileImage && user.profileImage.public_id) {
+      await deleteImage(user.profileImage.public_id);
+    }
+
+    // Remove profile image from user document
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { $unset: { profileImage: 1 } },
+      { new: true }
+    );
+
+    res.json({
+      success: true,
+      message: 'Profile image deleted successfully',
+      data: {
+        user: updatedUser.getPublicProfile()
+      }
+    });
+  } catch (error) {
+    console.error('Profile image delete error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Profile image deletion failed',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
+});
+
 // @route   POST /api/users/addresses
 // @desc    Add new address
 // @access  Private
@@ -87,8 +219,8 @@ router.post('/addresses', authenticateToken, validateAddress, async (req, res) =
     }
 
     const newAddress = {
-      name,
-      phone,
+      name: name || '',
+      phone: phone || '',
       address,
       city,
       state,
@@ -159,8 +291,8 @@ router.put('/addresses/:addressId', authenticateToken, validateAddress, async (r
     }
 
     const updateData = {
-      name,
-      phone,
+      name: name || '',
+      phone: phone || '',
       address,
       city,
       state,

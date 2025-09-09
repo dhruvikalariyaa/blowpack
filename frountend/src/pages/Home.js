@@ -8,7 +8,8 @@ import {
   StarIcon,
   TruckIcon,
   ShieldCheckIcon,
-  CurrencyRupeeIcon
+  CurrencyRupeeIcon,
+  BoltIcon
 } from '@heroicons/react/24/outline';
 import { fetchFeaturedProducts, fetchBestSellingProducts } from '../store/slices/productSlice';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -26,9 +27,9 @@ const Home = () => {
 
   const features = [
     {
-      icon: <TruckIcon className="h-8 w-8" />,
-      title: 'Free Shipping',
-      description: 'Free shipping on orders above ₹500'
+      icon: <BoltIcon className="h-8 w-8" />,   // 🔄 new icon
+      title: 'Fast Delivery',                  // 🔄 new title
+      description: 'Get your orders delivered quickly and safely' // 🔄 new desc
     },
     {
       icon: <ShieldCheckIcon className="h-8 w-8" />,
@@ -70,13 +71,13 @@ const Home = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/products">
-                  <Button size="lg" className="w-full sm:w-auto">
+                  <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-blue-700 hover:border-blue-700">
                     Shop Now
                     <ArrowRightIcon className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
                 <Link to="/about">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto text-white border-white hover:bg-white hover:text-primary-600">
+                  <Button size="lg" variant="secondary" className="bg-white text-primary-600 hover:bg-gray-100">
                     Learn More
                   </Button>
                 </Link>
@@ -110,7 +111,7 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              🔥 Best Sellers
+              Best Sellers
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Our most popular products loved by thousands of customers
@@ -200,7 +201,7 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              ⭐ Featured Products
+              Featured Products
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Handpicked premium products with exceptional quality and customer satisfaction
@@ -291,11 +292,11 @@ const Home = () => {
             🚀 Ready to Transform Your Business?
           </h2>
           <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
-            Join 10,000+ satisfied customers who trust Blow Pack Plastic Industries for their premium plastic product needs
+            Join 500+ satisfied customers who trust Blow Pack Plastic Industries for their premium plastic product needs
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/products">
-              <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-primary-600">
+              <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-blue-700 hover:border-blue-700">
                 🛍️ Shop Now
               </Button>
             </Link>
@@ -309,15 +310,15 @@ const Home = () => {
           {/* Trust Indicators */}
           <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary-200">500+</div>
+              <div className="text-2xl font-bold text-primary-200">100+</div>
               <div className="text-sm text-primary-100">Products</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary-200">10K+</div>
+              <div className="text-2xl font-bold text-primary-200">500+</div>
               <div className="text-sm text-primary-100">Happy Customers</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary-200">25+</div>
+              <div className="text-2xl font-bold text-primary-200">9+</div>
               <div className="text-sm text-primary-100">Years Experience</div>
             </div>
             <div className="text-center">

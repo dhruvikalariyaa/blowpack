@@ -326,6 +326,155 @@ router.post('/change-password', authenticateToken, async (req, res) => {
   }
 });
 
+// @route   POST /api/auth/send-verification-email
+// @desc    Send email verification OTP
+// @access  Private
+router.post('/send-verification-email', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    if (user.emailVerified) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is already verified'
+      });
+    }
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+    const emailVerificationExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+    // Update user with OTP and token
+    user.emailVerificationToken = emailVerificationToken;
+    user.emailVerificationExpire = emailVerificationExpire;
+    user.emailVerificationOTP = otp;
+    await user.save();
+
+    // Send verification email with OTP
+    const emailResult = await sendEmail(
+      user.email,
+      emailTemplates.emailVerification(user.name, otp).subject,
+      emailTemplates.emailVerification(user.name, otp).html
+    );
+
+    if (!emailResult.success) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to send verification email',
+        error: emailResult.error
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Verification email sent successfully',
+      data: {
+        otp: otp // Only for development/testing - remove in production
+      }
+    });
+  } catch (error) {
+    console.error('Send verification email error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to send verification email',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
+});
+
+// @route   POST /api/auth/verify-email
+// @desc    Verify email with OTP
+// @access  Private
+router.post('/verify-email', authenticateToken, async (req, res) => {
+  try {
+    const { otp } = req.body;
+
+    if (!otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'OTP is required'
+      });
+    }
+
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    if (user.emailVerified) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is already verified'
+      });
+    }
+
+    // Check if verification token exists and is not expired
+    if (!user.emailVerificationToken || !user.emailVerificationExpire) {
+      return res.status(400).json({
+        success: false,
+        message: 'No verification request found. Please request a new verification email.'
+      });
+    }
+
+    if (user.emailVerificationExpire < Date.now()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Verification code has expired. Please request a new one.'
+      });
+    }
+
+    // Validate OTP format
+    if (!/^\d{6}$/.test(otp)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid OTP format. Please enter a 6-digit number.'
+      });
+    }
+
+    // Verify OTP
+    if (user.emailVerificationOTP !== otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid verification code. Please check and try again.'
+      });
+    }
+
+    // Mark email as verified
+    user.emailVerified = true;
+    user.emailVerificationToken = undefined;
+    user.emailVerificationExpire = undefined;
+    user.emailVerificationOTP = undefined;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Email verified successfully',
+      data: {
+        user: user.getPublicProfile()
+      }
+    });
+  } catch (error) {
+    console.error('Verify email error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Email verification failed',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
+});
+
 // @route   GET /api/auth/google
 // @desc    Google OAuth login
 // @access  Public

@@ -8,6 +8,10 @@ export const API_ENDPOINTS = {
   RESET_PASSWORD: `${API_BASE_URL}/api/auth/reset-password`,
   GET_CURRENT_USER: `${API_BASE_URL}/api/auth/me`,
   
+  // User profile endpoints
+  USER_PROFILE: `${API_BASE_URL}/api/users/profile`,
+  USER_PROFILE_IMAGE: `${API_BASE_URL}/api/users/profile/image`,
+  
   // Product endpoints
   PRODUCTS: `${API_BASE_URL}/api/products`,
   PRODUCT_BY_ID: (id) => `${API_BASE_URL}/api/products/${id}`,
