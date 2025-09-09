@@ -9,19 +9,25 @@ import {
   TruckIcon,
   ShieldCheckIcon,
   CurrencyRupeeIcon,
-  BoltIcon
+  BoltIcon,
+  ShoppingBagIcon,
+  PhoneIcon,
+  RocketLaunchIcon,
+  FireIcon,
+  SparklesIcon
 } from '@heroicons/react/24/outline';
 import { fetchFeaturedProducts, fetchBestSellingProducts } from '../store/slices/productSlice';
 import LoadingSpinner, { PageLoader } from '../components/common/LoadingSpinner';
 import Button from '../components/common/Button';
 
 // Memoized Product Card Component
-const ProductCard = memo(({ product, badge, badgeColor }) => (
+const ProductCard = memo(({ product, badge, badgeColor, badgeIcon }) => (
   <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 group relative">
     {/* Badge */}
     <div className="absolute top-2 left-2 z-10">
-      <span className={`${badgeColor} text-white text-xs font-bold px-2 py-1 rounded-full`}>
-        {badge}
+      <span className={`${badgeColor} text-white text-xs font-bold px-2 py-1 rounded-full flex items-center space-x-1`}>
+        {badgeIcon && <span className="text-xs">{badgeIcon}</span>}
+        <span>{badge}</span>
       </span>
     </div>
     
@@ -255,12 +261,14 @@ const Home = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/products">
               <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-blue-700 hover:border-blue-700">
-                🛍️ Shop Now
+                <ShoppingBagIcon className="h-5 w-5 mr-2" />
+                Shop Now
               </Button>
             </Link>
             <Link to="/contact">
               <Button size="lg" variant="secondary" className="bg-white text-primary-600 hover:bg-gray-100">
-                📞 Get Quote
+                <PhoneIcon className="h-5 w-5 mr-2" />
+                Get Quote
               </Button>
             </Link>
           </div>

@@ -25,18 +25,24 @@ const Login = () => {
   } = useForm();
 
   const from = location.state?.from?.pathname || '/';
+  const { user } = useSelector((state) => state.auth);
 
   // Combined effect for authentication and cleanup
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate(from, { replace: true });
+    if (isAuthenticated && user) {
+      // Redirect admin users to admin dashboard
+      if (user.role === 'admin') {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
     }
     
     return () => {
       dispatch(clearError());
       dispatch(clearSuccess());
     };
-  }, [isAuthenticated, navigate, from, dispatch]);
+  }, [isAuthenticated, user, navigate, from, dispatch]);
 
   // Initialize Google Sign-In only once
   useEffect(() => {
@@ -73,8 +79,13 @@ const Login = () => {
 
   const handleGoogleSuccess = async (userInfo, credential) => {
     try {
-      await dispatch(googleAuth({ userInfo, credential })).unwrap();
-      navigate(from, { replace: true });
+      const result = await dispatch(googleAuth({ userInfo, credential })).unwrap();
+      // Redirect admin users to admin dashboard
+      if (result.user?.role === 'admin') {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
     } catch (error) {
       console.error('Google authentication failed:', error);
     }

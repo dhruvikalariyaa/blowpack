@@ -67,6 +67,7 @@ app.use('/api/cart', require('./routes/cart'));
 app.use('/api/wishlist', require('./routes/wishlist'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/reviews', require('./routes/reviews'));
+app.use('/api/contact', require('./routes/contact'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/admin', adminLimiter, require('./routes/admin'));
 

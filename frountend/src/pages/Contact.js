@@ -5,13 +5,19 @@ import {
   MapPinIcon, 
   PhoneIcon, 
   EnvelopeIcon,
-  ClockIcon
+  ClockIcon,
+  CheckCircleIcon,
+  ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 import Button from '../components/common/Button';
 import Input from '../components/common/Input';
+import api from '../config/axios';
+import { API_ENDPOINTS } from '../config/api';
 
 const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', null
+  const [submitMessage, setSubmitMessage] = useState('');
   
   const {
     register,
@@ -22,12 +28,36 @@ const Contact = () => {
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    console.log('Form submitted:', data);
-    reset();
-    setIsSubmitting(false);
-    alert('Thank you for your message! We will get back to you soon.');
+    setSubmitStatus(null);
+    setSubmitMessage('');
+
+    try {
+      const response = await api.post(API_ENDPOINTS.CONTACT, data);
+      
+      if (response.data.success) {
+        setSubmitStatus('success');
+        setSubmitMessage(response.data.message);
+        reset();
+      } else {
+        setSubmitStatus('error');
+        setSubmitMessage(response.data.message || 'Failed to submit form. Please try again.');
+      }
+    } catch (error) {
+      console.error('Contact form submission error:', error);
+      setSubmitStatus('error');
+      
+      if (error.response?.data?.message) {
+        setSubmitMessage(error.response.data.message);
+      } else if (error.response?.data?.errors) {
+        // Handle validation errors
+        const validationErrors = error.response.data.errors.map(err => err.msg).join(', ');
+        setSubmitMessage(validationErrors);
+      } else {
+        setSubmitMessage('Failed to submit form. Please check your connection and try again.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactInfo = [
@@ -93,6 +123,22 @@ const Contact = () => {
           {/* Contact Form */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Send us a Message</h2>
+            
+            {/* Success/Error Message */}
+            {submitStatus && (
+              <div className={`mb-6 p-4 rounded-lg flex items-center space-x-3 ${
+                submitStatus === 'success' 
+                  ? 'bg-green-50 border border-green-200 text-green-800' 
+                  : 'bg-red-50 border border-red-200 text-red-800'
+              }`}>
+                {submitStatus === 'success' ? (
+                  <CheckCircleIcon className="h-5 w-5 text-green-600 flex-shrink-0" />
+                ) : (
+                  <ExclamationTriangleIcon className="h-5 w-5 text-red-600 flex-shrink-0" />
+                )}
+                <p className="text-sm font-medium">{submitMessage}</p>
+              </div>
+            )}
             
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

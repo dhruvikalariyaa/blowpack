@@ -43,6 +43,7 @@ import AdminOrders from './pages/admin/Orders';
 import AdminCategories from './pages/admin/Categories';
 import AdminUsers from './pages/admin/Users';
 import AdminReviews from './pages/admin/Reviews';
+import AdminContacts from './pages/admin/Contacts';
 
 // Redux actions
 import { getCurrentUser } from './store/slices/authSlice';
@@ -138,6 +139,7 @@ function App() {
               <Route path="/admin/categories" element={<AdminRoute><AdminCategories /></AdminRoute>} />
               <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
               <Route path="/admin/reviews" element={<AdminRoute><AdminReviews /></AdminRoute>} />
+              <Route path="/admin/contacts" element={<AdminRoute><AdminContacts /></AdminRoute>} />
               
               {/* 404 Route */}
               <Route path="*" element={<NotFound />} />

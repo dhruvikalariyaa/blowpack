@@ -25,7 +25,7 @@ const sendEmail = async (to, subject, html, text) => {
     const transporter = createTransporter();
     
     const mailOptions = {
-      from: `"Packwell Plastic Industries" <${process.env.EMAIL_USER}>`,
+      from: `"blowpack Plastic Industries" <${process.env.EMAIL_USER}>`,
       to,
       subject,
       html,
@@ -44,22 +44,22 @@ const sendEmail = async (to, subject, html, text) => {
 // Email templates
 const emailTemplates = {
   welcome: (userName) => ({
-    subject: 'Welcome to Packwell Plastic Industries',
+    subject: 'Welcome to blowpack Plastic Industries',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #2563eb;">Welcome to Packwell Plastic Industries!</h2>
+        <h2 style="color: #2563eb;">Welcome to blowpack Plastic Industries!</h2>
         <p>Dear ${userName},</p>
         <p>Thank you for registering with us. We're excited to have you as our customer!</p>
         <p>You can now browse our wide range of plastic products and place orders.</p>
         <p>If you have any questions, feel free to contact our support team.</p>
         <br>
-        <p>Best regards,<br>Packwell Plastic Industries Team</p>
+        <p>Best regards,<br>blowpack Plastic Industries Team</p>
       </div>
     `
   }),
 
   orderConfirmation: (orderNumber, userName, items, totalAmount) => ({
-    subject: `🎉 Order Confirmation - ${orderNumber} | Packwell Plastic Industries`,
+    subject: `🎉 Order Confirmation - ${orderNumber} | blowpack Plastic Industries`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -73,7 +73,7 @@ const emailTemplates = {
           
           <!-- Header -->
           <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); padding: 30px; text-align: center;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">Packwell Plastic Industries</h1>
+            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">blowpack Plastic Industries</h1>
             <p style="color: #e0e7ff; margin: 5px 0 0 0; font-size: 16px;">Quality Plastic Products</p>
           </div>
 
@@ -143,13 +143,13 @@ const emailTemplates = {
             <!-- Contact Info -->
             <div style="text-align: center; margin: 40px 0 20px 0; padding: 20px; background-color: #f8fafc; border-radius: 8px;">
               <p style="color: #6b7280; margin: 0 0 10px 0; font-size: 14px;">Need help? Contact our support team</p>
-              <p style="color: #1f2937; margin: 0; font-weight: 600;">📞 +91 9876543210 | 📧 support@packwellplastic.com</p>
+              <p style="color: #1f2937; margin: 0; font-weight: 600;">📞 +91 9876543210 | 📧 support@blowpackplastic.com</p>
             </div>
           </div>
 
           <!-- Footer -->
           <div style="background-color: #1f2937; color: #9ca3af; padding: 20px; text-align: center; font-size: 14px;">
-            <p style="margin: 0 0 10px 0;">© 2024 Packwell Plastic Industries. All rights reserved.</p>
+            <p style="margin: 0 0 10px 0;">© 2024 blowpack Plastic Industries. All rights reserved.</p>
             <p style="margin: 0;">Thank you for choosing us for your plastic product needs!</p>
           </div>
         </div>
@@ -159,7 +159,7 @@ const emailTemplates = {
   }),
 
   orderConfirmed: (orderNumber, userName) => ({
-    subject: `✅ Order Confirmed - ${orderNumber} | Packwell Plastic Industries`,
+    subject: `✅ Order Confirmed - ${orderNumber} | blowpack Plastic Industries`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -173,7 +173,7 @@ const emailTemplates = {
           
           <!-- Header -->
           <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); padding: 30px; text-align: center;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">Packwell Plastic Industries</h1>
+            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">blowpack Plastic Industries</h1>
             <p style="color: #e0e7ff; margin: 5px 0 0 0; font-size: 16px;">Quality Plastic Products</p>
           </div>
 
@@ -226,7 +226,7 @@ const emailTemplates = {
                 </div>
                 <div>
                   <div style="color: #6b7280; font-size: 14px; margin-bottom: 5px;">Email</div>
-                  <div style="color: #1f2937; font-weight: 600;">support@packwellplastic.com</div>
+                  <div style="color: #1f2937; font-weight: 600;">support@blowpackplastic.com</div>
                 </div>
               </div>
               <div style="color: #6b7280; font-size: 14px;">
@@ -238,7 +238,7 @@ const emailTemplates = {
 
           <!-- Footer -->
           <div style="background-color: #1f2937; color: #9ca3af; padding: 20px; text-align: center; font-size: 14px;">
-            <p style="margin: 0 0 10px 0;">© 2024 Packwell Plastic Industries. All rights reserved.</p>
+            <p style="margin: 0 0 10px 0;">© 2024 blowpack Plastic Industries. All rights reserved.</p>
             <p style="margin: 0;">Thank you for choosing us for your plastic product needs!</p>
           </div>
         </div>
@@ -248,7 +248,7 @@ const emailTemplates = {
   }),
 
   orderProcessing: (orderNumber, userName) => ({
-    subject: `🔄 Order Processing - ${orderNumber} | Packwell Plastic Industries`,
+    subject: `🔄 Order Processing - ${orderNumber} | blowpack Plastic Industries`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -262,7 +262,7 @@ const emailTemplates = {
           
           <!-- Header -->
           <div style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); padding: 30px; text-align: center;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">Packwell Plastic Industries</h1>
+            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">blowpack Plastic Industries</h1>
             <p style="color: #e9d5ff; margin: 5px 0 0 0; font-size: 16px;">Quality Plastic Products</p>
           </div>
 
@@ -326,7 +326,7 @@ const emailTemplates = {
                 </div>
                 <div>
                   <div style="color: #6b7280; font-size: 14px; margin-bottom: 5px;">Email</div>
-                  <div style="color: #1f2937; font-weight: 600;">support@packwellplastic.com</div>
+                  <div style="color: #1f2937; font-weight: 600;">support@blowpackplastic.com</div>
                 </div>
               </div>
               <div style="color: #6b7280; font-size: 14px;">
@@ -338,7 +338,7 @@ const emailTemplates = {
 
           <!-- Footer -->
           <div style="background-color: #1f2937; color: #9ca3af; padding: 20px; text-align: center; font-size: 14px;">
-            <p style="margin: 0 0 10px 0;">© 2024 Packwell Plastic Industries. All rights reserved.</p>
+            <p style="margin: 0 0 10px 0;">© 2024 blowpack Plastic Industries. All rights reserved.</p>
             <p style="margin: 0;">Thank you for choosing us for your plastic product needs!</p>
           </div>
         </div>
@@ -348,7 +348,7 @@ const emailTemplates = {
   }),
 
   orderShipped: (orderNumber, userName, trackingNumber) => ({
-    subject: `🚚 Order Shipped - ${orderNumber} | Packwell Plastic Industries`,
+    subject: `🚚 Order Shipped - ${orderNumber} | blowpack Plastic Industries`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -362,7 +362,7 @@ const emailTemplates = {
           
           <!-- Header -->
           <div style="background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%); padding: 30px; text-align: center;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">Packwell Plastic Industries</h1>
+            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">blowpack Plastic Industries</h1>
             <p style="color: #dcfce7; margin: 5px 0 0 0; font-size: 16px;">Quality Plastic Products</p>
           </div>
 
@@ -435,7 +435,7 @@ const emailTemplates = {
                 </div>
                 <div>
                   <div style="color: #6b7280; font-size: 14px; margin-bottom: 5px;">Email</div>
-                  <div style="color: #1f2937; font-weight: 600;">support@packwellplastic.com</div>
+                  <div style="color: #1f2937; font-weight: 600;">support@blowpackplastic.com</div>
                 </div>
               </div>
               <div style="color: #6b7280; font-size: 14px;">
@@ -447,7 +447,7 @@ const emailTemplates = {
 
           <!-- Footer -->
           <div style="background-color: #1f2937; color: #9ca3af; padding: 20px; text-align: center; font-size: 14px;">
-            <p style="margin: 0 0 10px 0;">© 2024 Packwell Plastic Industries. All rights reserved.</p>
+            <p style="margin: 0 0 10px 0;">© 2024 blowpack Plastic Industries. All rights reserved.</p>
             <p style="margin: 0;">Thank you for choosing us for your plastic product needs!</p>
           </div>
         </div>
@@ -457,7 +457,7 @@ const emailTemplates = {
   }),
 
   orderDelivered: (orderNumber, userName) => ({
-    subject: `🎉 Order Delivered - ${orderNumber} | Packwell Plastic Industries`,
+    subject: `🎉 Order Delivered - ${orderNumber} | blowpack Plastic Industries`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -471,7 +471,7 @@ const emailTemplates = {
           
           <!-- Header -->
           <div style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 30px; text-align: center;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">Packwell Plastic Industries</h1>
+            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">blowpack Plastic Industries</h1>
             <p style="color: #d1fae5; margin: 5px 0 0 0; font-size: 16px;">Quality Plastic Products</p>
           </div>
 
@@ -537,7 +537,7 @@ const emailTemplates = {
                 </div>
                 <div>
                   <div style="color: #6b7280; font-size: 14px; margin-bottom: 5px;">Email</div>
-                  <div style="color: #1f2937; font-weight: 600;">support@packwellplastic.com</div>
+                  <div style="color: #1f2937; font-weight: 600;">support@blowpackplastic.com</div>
                 </div>
               </div>
               <div style="color: #6b7280; font-size: 14px;">
@@ -549,7 +549,7 @@ const emailTemplates = {
 
           <!-- Footer -->
           <div style="background-color: #1f2937; color: #9ca3af; padding: 20px; text-align: center; font-size: 14px;">
-            <p style="margin: 0 0 10px 0;">© 2024 Packwell Plastic Industries. All rights reserved.</p>
+            <p style="margin: 0 0 10px 0;">© 2024 blowpack Plastic Industries. All rights reserved.</p>
             <p style="margin: 0;">Thank you for choosing us for your plastic product needs!</p>
           </div>
         </div>
@@ -559,7 +559,7 @@ const emailTemplates = {
   }),
 
   orderCompleted: (orderNumber, userName) => ({
-    subject: `🏆 Order Completed - ${orderNumber} | Packwell Plastic Industries`,
+    subject: `🏆 Order Completed - ${orderNumber} | blowpack Plastic Industries`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -573,7 +573,7 @@ const emailTemplates = {
           
           <!-- Header -->
           <div style="background: linear-gradient(135deg, #7c2d12 0%, #ea580c 100%); padding: 30px; text-align: center;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">Packwell Plastic Industries</h1>
+            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">blowpack Plastic Industries</h1>
             <p style="color: #fed7aa; margin: 5px 0 0 0; font-size: 16px;">Quality Plastic Products</p>
           </div>
 
@@ -589,7 +589,7 @@ const emailTemplates = {
             
             <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">Dear <strong>${userName}</strong>,</p>
             
-            <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 30px 0;">Congratulations! Your order has been successfully completed and closed. We're thrilled that you chose Packwell Plastic Industries for your plastic product needs, and we hope you're completely satisfied with your purchase.</p>
+            <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 30px 0;">Congratulations! Your order has been successfully completed and closed. We're thrilled that you chose blowpack Plastic Industries for your plastic product needs, and we hope you're completely satisfied with your purchase.</p>
 
             <!-- Order Details Card -->
             <div style="background-color: #f8fafc; border: 2px solid #e5e7eb; border-radius: 12px; padding: 25px; margin: 30px 0;">
@@ -614,7 +614,7 @@ const emailTemplates = {
                 <li>We hope you're delighted with your purchase</li>
                 <li>Your feedback helps us improve our services</li>
                 <li>We look forward to serving you again</li>
-                <li>Thank you for choosing Packwell Plastic Industries</li>
+                <li>Thank you for choosing blowpack Plastic Industries</li>
               </ul>
             </div>
 
@@ -639,7 +639,7 @@ const emailTemplates = {
                 </div>
                 <div>
                   <div style="color: #6b7280; font-size: 14px; margin-bottom: 5px;">Email</div>
-                  <div style="color: #1f2937; font-weight: 600;">support@packwellplastic.com</div>
+                  <div style="color: #1f2937; font-weight: 600;">support@blowpackplastic.com</div>
                 </div>
               </div>
               <div style="color: #6b7280; font-size: 14px;">
@@ -651,7 +651,7 @@ const emailTemplates = {
 
           <!-- Footer -->
           <div style="background-color: #1f2937; color: #9ca3af; padding: 20px; text-align: center; font-size: 14px;">
-            <p style="margin: 0 0 10px 0;">© 2024 Packwell Plastic Industries. All rights reserved.</p>
+            <p style="margin: 0 0 10px 0;">© 2024 blowpack Plastic Industries. All rights reserved.</p>
             <p style="margin: 0;">Thank you for choosing us for your plastic product needs!</p>
           </div>
         </div>
@@ -671,7 +671,7 @@ const emailTemplates = {
         <p><strong>Reason:</strong> ${reason || 'Order cancelled by admin'}</p>
         <p>If you have any questions about this cancellation or would like to place a new order, please contact our support team.</p>
         <br>
-        <p>Best regards,<br>Packwell Plastic Industries Team</p>
+        <p>Best regards,<br>blowpack Plastic Industries Team</p>
       </div>
     `
   }),
@@ -687,13 +687,13 @@ const emailTemplates = {
         <p>This link will expire in 1 hour.</p>
         <p>If you didn't request this, please ignore this email.</p>
         <br>
-        <p>Best regards,<br>Packwell Plastic Industries Team</p>
+        <p>Best regards,<br>blowpack Plastic Industries Team</p>
       </div>
     `
   }),
 
   emailVerification: (userName, otp) => ({
-    subject: '📧 Verify Your Email Address - Packwell Plastic Industries',
+    subject: '📧 Verify Your Email Address - blowpack Plastic Industries',
     html: `
       <!DOCTYPE html>
       <html>
@@ -707,7 +707,7 @@ const emailTemplates = {
           
           <!-- Header -->
           <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); padding: 30px; text-align: center;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">Packwell Plastic Industries</h1>
+            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">blowpack Plastic Industries</h1>
             <p style="color: #e0e7ff; margin: 5px 0 0 0; font-size: 16px;">Quality Plastic Products</p>
           </div>
 
@@ -723,7 +723,7 @@ const emailTemplates = {
             
             <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">Dear <strong>${userName}</strong>,</p>
             
-            <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 30px 0;">Thank you for registering with Packwell Plastic Industries! To complete your account setup and ensure you receive important updates about your orders, please verify your email address using the verification code below.</p>
+            <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 30px 0;">Thank you for registering with blowpack Plastic Industries! To complete your account setup and ensure you receive important updates about your orders, please verify your email address using the verification code below.</p>
 
             <!-- OTP Code Card -->
             <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; border-radius: 12px; padding: 30px; margin: 30px 0; text-align: center;">
@@ -771,13 +771,13 @@ const emailTemplates = {
             <!-- Contact Info -->
             <div style="text-align: center; margin: 40px 0 20px 0; padding: 20px; background-color: #f8fafc; border-radius: 8px;">
               <p style="color: #6b7280; margin: 0 0 10px 0; font-size: 14px;">Need help? Contact our support team</p>
-              <p style="color: #1f2937; margin: 0; font-weight: 600;">📞 +91 9876543210 | 📧 support@packwellplastic.com</p>
+              <p style="color: #1f2937; margin: 0; font-weight: 600;">📞 +91 9876543210 | 📧 support@blowpackplastic.com</p>
             </div>
           </div>
 
           <!-- Footer -->
           <div style="background-color: #1f2937; color: #9ca3af; padding: 20px; text-align: center; font-size: 14px;">
-            <p style="margin: 0 0 10px 0;">© 2024 Packwell Plastic Industries. All rights reserved.</p>
+            <p style="margin: 0 0 10px 0;">© 2024 blowpack Plastic Industries. All rights reserved.</p>
             <p style="margin: 0;">Thank you for choosing us for your plastic product needs!</p>
           </div>
         </div>
@@ -787,7 +787,7 @@ const emailTemplates = {
   }),
 
   newOrderNotification: (order, user, orderItems) => ({
-    subject: `🚨 New Order Received - ${order.orderNumber} | Packwell Plastic Industries`,
+    subject: `🚨 New Order Received - ${order.orderNumber} | blowpack Plastic Industries`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -802,7 +802,7 @@ const emailTemplates = {
           <!-- Header -->
           <div style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); padding: 30px; text-align: center;">
             <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">🚨 New Order Alert!</h1>
-            <p style="color: #fecaca; margin: 5px 0 0 0; font-size: 16px;">Packwell Plastic Industries</p>
+            <p style="color: #fecaca; margin: 5px 0 0 0; font-size: 16px;">blowpack Plastic Industries</p>
           </div>
 
           <!-- Main Content -->
@@ -938,8 +938,8 @@ const emailTemplates = {
 
           <!-- Footer -->
           <div style="background-color: #1f2937; color: #9ca3af; padding: 20px; text-align: center; font-size: 14px;">
-            <p style="margin: 0 0 10px 0;">© 2024 Packwell Plastic Industries. All rights reserved.</p>
-            <p style="margin: 0;">This is an automated notification from the Packwell Plastic Industries system.</p>
+            <p style="margin: 0 0 10px 0;">© 2024 blowpack Plastic Industries. All rights reserved.</p>
+            <p style="margin: 0;">This is an automated notification from the blowpack Plastic Industries system.</p>
           </div>
         </div>
       </body>
@@ -1020,8 +1020,308 @@ const emailTemplates = {
         <p>Admin Panel: <a href="${process.env.FRONTEND_URL}/admin/orders" style="color: #2563eb;">View Orders</a></p>
         
         <br>
-        <p>Best regards,<br>Packwell Plastic Industries System</p>
+        <p>Best regards,<br>blowpack Plastic Industries System</p>
       </div>
+    `
+  }),
+
+  // Contact Form Email Templates
+  contactFormConfirmation: (contactData) => ({
+    subject: `✅ Thank You for Contacting Us - ${contactData.subject} | Blow Pack Plastic Industries`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Contact Form Confirmation</title>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); padding: 30px; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">Blow Pack Plastic Industries</h1>
+            <p style="color: #e0e7ff; margin: 5px 0 0 0; font-size: 16px;">Quality Plastic Products</p>
+          </div>
+
+          <!-- Main Content -->
+          <div style="padding: 40px 30px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <div style="background-color: #10b981; color: white; padding: 15px 30px; border-radius: 50px; display: inline-block; font-size: 18px; font-weight: 600;">
+                ✅ Message Received!
+              </div>
+            </div>
+
+            <h2 style="color: #1f2937; font-size: 24px; margin: 0 0 20px 0; text-align: center;">Thank You for Contacting Us!</h2>
+            
+            <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">Dear <strong>${contactData.firstName} ${contactData.lastName}</strong>,</p>
+            
+            <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 30px 0;">We have successfully received your message and our team will get back to you within 24 hours. We appreciate your interest in our plastic products and services.</p>
+
+            <!-- Message Details Card -->
+            <div style="background-color: #f8fafc; border: 2px solid #e5e7eb; border-radius: 12px; padding: 25px; margin: 30px 0;">
+              <h3 style="color: #1f2937; font-size: 20px; margin: 0 0 20px 0; text-align: center;">📋 Your Message Details</h3>
+              
+              <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
+                <span style="color: #6b7280; font-weight: 600;">Subject:</span>
+                <span style="color: #1f2937; font-weight: 600;">${contactData.subject}</span>
+              </div>
+              
+              <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
+                <span style="color: #6b7280; font-weight: 600;">Submitted:</span>
+                <span style="color: #1f2937; font-weight: 600;">${new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              </div>
+              
+              <div style="margin-top: 20px;">
+                <div style="color: #6b7280; font-weight: 600; margin-bottom: 10px;">Your Message:</div>
+                <div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; color: #1f2937; line-height: 1.6;">
+                  ${contactData.message}
+                </div>
+              </div>
+            </div>
+
+            <!-- What's Next -->
+            <div style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 20px; margin: 30px 0; border-radius: 0 8px 8px 0;">
+              <h4 style="color: #1e40af; margin: 0 0 15px 0; font-size: 16px;">📬 What Happens Next?</h4>
+              <ul style="color: #1e40af; margin: 0; padding-left: 20px;">
+                <li>Our team will review your message within 24 hours</li>
+                <li>We'll respond to your inquiry via email or phone</li>
+                <li>If you have urgent questions, feel free to call us directly</li>
+                <li>We'll provide detailed information about our products and services</li>
+              </ul>
+            </div>
+
+            <!-- Contact Information -->
+            <div style="text-align: center; margin: 40px 0 20px 0; padding: 20px; background-color: #f8fafc; border-radius: 8px;">
+              <h4 style="color: #1f2937; margin: 0 0 15px 0; font-size: 18px;">📞 Our Contact Information</h4>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
+                <div>
+                  <div style="color: #6b7280; font-size: 14px; margin-bottom: 5px;">Phone</div>
+                  <div style="color: #1f2937; font-weight: 600;">+91 95378 94448</div>
+                  <div style="color: #1f2937; font-weight: 600;">+91 97274 28583</div>
+                </div>
+                <div>
+                  <div style="color: #6b7280; font-size: 14px; margin-bottom: 5px;">Email</div>
+                  <div style="color: #1f2937; font-weight: 600;">blowpackplastic@gmail.com</div>
+                </div>
+              </div>
+              <div style="color: #6b7280; font-size: 14px;">
+                <div>📍 Address: Gala no- 06, Pali industry estate, Wagdhara road, Near by jalaram temple, Dadra nagar, Dadra and Nagar Haveli, Gujarat, India</div>
+                <div>🕒 Business Hours: Mon-Fri 9:00 AM - 6:00 PM, Sat 9:00 AM - 2:00 PM</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div style="background-color: #1f2937; color: #9ca3af; padding: 20px; text-align: center; font-size: 14px;">
+            <p style="margin: 0 0 10px 0;">© 2024 Blow Pack Plastic Industries. All rights reserved.</p>
+            <p style="margin: 0;">Thank you for choosing us for your plastic product needs!</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+  }),
+
+  contactFormAdminNotification: (contactData) => ({
+    subject: `🚨 New Contact Form Submission - ${contactData.subject} | Blow Pack Plastic Industries`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>New Contact Form Submission</title>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <div style="max-width: 700px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); padding: 30px; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">🚨 New Contact Form Submission</h1>
+            <p style="color: #fecaca; margin: 5px 0 0 0; font-size: 16px;">Blow Pack Plastic Industries</p>
+          </div>
+
+          <!-- Main Content -->
+          <div style="padding: 40px 30px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <div style="background-color: #dc2626; color: white; padding: 15px 30px; border-radius: 50px; display: inline-block; font-size: 18px; font-weight: 600;">
+                ⚡ Action Required
+              </div>
+            </div>
+
+            <h2 style="color: #1f2937; font-size: 24px; margin: 0 0 20px 0; text-align: center;">New Customer Inquiry Received</h2>
+            
+            <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 30px 0;">A new contact form submission has been received and requires your attention. Please review the details below and respond to the customer promptly.</p>
+
+            <!-- Contact Details Card -->
+            <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center;">
+              <h3 style="color: #ffffff; font-size: 20px; margin: 0 0 20px 0;">📋 Contact Details</h3>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div>
+                  <div style="color: #e0e7ff; font-size: 14px; margin-bottom: 5px;">Customer Name</div>
+                  <div style="color: #ffffff; font-size: 18px; font-weight: 700;">${contactData.firstName} ${contactData.lastName}</div>
+                </div>
+                <div>
+                  <div style="color: #e0e7ff; font-size: 14px; margin-bottom: 5px;">Subject</div>
+                  <div style="color: #ffffff; font-size: 18px; font-weight: 700;">${contactData.subject}</div>
+                </div>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                  <div style="color: #e0e7ff; font-size: 14px; margin-bottom: 5px;">Email</div>
+                  <div style="color: #ffffff; font-size: 16px; font-weight: 600;">${contactData.email}</div>
+                </div>
+                <div>
+                  <div style="color: #e0e7ff; font-size: 14px; margin-bottom: 5px;">Phone</div>
+                  <div style="color: #ffffff; font-size: 16px; font-weight: 600;">${contactData.phone}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Message Content -->
+            <div style="background-color: #f8fafc; border: 2px solid #e5e7eb; border-radius: 12px; padding: 25px; margin: 30px 0;">
+              <h3 style="color: #1f2937; font-size: 20px; margin: 0 0 20px 0; text-align: center;">💬 Customer Message</h3>
+              <div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; color: #1f2937; line-height: 1.6; font-size: 16px;">
+                ${contactData.message}
+              </div>
+            </div>
+
+            <!-- Submission Info -->
+            <div style="background-color: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 12px; padding: 25px; margin: 30px 0;">
+              <h3 style="color: #0c4a6e; font-size: 20px; margin: 0 0 20px 0; text-align: center;">📅 Submission Information</h3>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                  <div style="color: #0c4a6e; font-size: 14px; margin-bottom: 5px;">Submitted Date</div>
+                  <div style="color: #0c4a6e; font-size: 16px; font-weight: 600;">${new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                </div>
+                <div>
+                  <div style="color: #0c4a6e; font-size: 14px; margin-bottom: 5px;">Submitted Time</div>
+                  <div style="color: #0c4a6e; font-size: 16px; font-weight: 600;">${new Date().toLocaleTimeString('en-IN')}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Required -->
+            <div style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white; padding: 25px; margin: 30px 0; border-radius: 12px; text-align: center;">
+              <h3 style="color: #ffffff; margin: 0 0 15px 0; font-size: 20px;">⚡ Action Required</h3>
+              <p style="color: #fecaca; margin: 0 0 20px 0; font-size: 16px;">Please respond to this customer inquiry within 24 hours to maintain excellent customer service.</p>
+              <a href="${process.env.FRONTEND_URL}/admin/contacts" style="background-color: #ffffff; color: #dc2626; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: 600; display: inline-block;">View in Admin Panel</a>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div style="background-color: #1f2937; color: #9ca3af; padding: 20px; text-align: center; font-size: 14px;">
+            <p style="margin: 0 0 10px 0;">© 2024 Blow Pack Plastic Industries. All rights reserved.</p>
+            <p style="margin: 0;">This is an automated notification from the Blow Pack Plastic Industries system.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+  }),
+
+  contactFormResponse: (contactData, responseMessage, adminName) => ({
+    subject: `Re: ${contactData.subject} - Response from Blow Pack Plastic Industries`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Response to Your Inquiry</title>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); padding: 30px; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">Blow Pack Plastic Industries</h1>
+            <p style="color: #e0e7ff; margin: 5px 0 0 0; font-size: 16px;">Quality Plastic Products</p>
+          </div>
+
+          <!-- Main Content -->
+          <div style="padding: 40px 30px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <div style="background-color: #10b981; color: white; padding: 15px 30px; border-radius: 50px; display: inline-block; font-size: 18px; font-weight: 600;">
+                📧 Response to Your Inquiry
+              </div>
+            </div>
+
+            <h2 style="color: #1f2937; font-size: 24px; margin: 0 0 20px 0; text-align: center;">Thank You for Your Inquiry!</h2>
+            
+            <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">Dear <strong>${contactData.firstName} ${contactData.lastName}</strong>,</p>
+            
+            <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 30px 0;">Thank you for contacting Blow Pack Plastic Industries. We have reviewed your inquiry and are pleased to provide you with the following response:</p>
+
+            <!-- Original Message Reference -->
+            <div style="background-color: #f8fafc; border: 2px solid #e5e7eb; border-radius: 12px; padding: 25px; margin: 30px 0;">
+              <h3 style="color: #1f2937; font-size: 18px; margin: 0 0 15px 0;">📋 Your Original Inquiry</h3>
+              <div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; color: #6b7280; font-style: italic;">
+                <strong>Subject:</strong> ${contactData.subject}<br>
+                <strong>Message:</strong> ${contactData.message}
+              </div>
+            </div>
+
+            <!-- Response Message -->
+            <div style="background-color: #eff6ff; border: 2px solid #3b82f6; border-radius: 12px; padding: 25px; margin: 30px 0;">
+              <h3 style="color: #1e40af; font-size: 18px; margin: 0 0 15px 0;">💬 Our Response</h3>
+              <div style="background-color: #ffffff; border: 1px solid #3b82f6; border-radius: 8px; padding: 20px; color: #1f2937; line-height: 1.6; font-size: 16px;">
+                ${responseMessage}
+              </div>
+            </div>
+
+            <!-- Next Steps -->
+            <div style="background-color: #f0fdf4; border-left: 4px solid #10b981; padding: 20px; margin: 30px 0; border-radius: 0 8px 8px 0;">
+              <h4 style="color: #065f46; margin: 0 0 15px 0; font-size: 16px;">📞 Need Further Assistance?</h4>
+              <ul style="color: #065f46; margin: 0; padding-left: 20px;">
+                <li>If you have additional questions, please don't hesitate to contact us</li>
+                <li>We're here to help with all your plastic product needs</li>
+                <li>You can reach us directly via phone or email</li>
+                <li>We look forward to serving you!</li>
+              </ul>
+            </div>
+
+            <!-- Contact Information -->
+            <div style="text-align: center; margin: 40px 0 20px 0; padding: 20px; background-color: #f8fafc; border-radius: 8px;">
+              <h4 style="color: #1f2937; margin: 0 0 15px 0; font-size: 18px;">📞 Our Contact Information</h4>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
+                <div>
+                  <div style="color: #6b7280; font-size: 14px; margin-bottom: 5px;">Phone</div>
+                  <div style="color: #1f2937; font-weight: 600;">+91 95378 94448</div>
+                  <div style="color: #1f2937; font-weight: 600;">+91 97274 28583</div>
+                </div>
+                <div>
+                  <div style="color: #6b7280; font-size: 14px; margin-bottom: 5px;">Email</div>
+                  <div style="color: #1f2937; font-weight: 600;">blowpackplastic@gmail.com</div>
+                </div>
+              </div>
+              <div style="color: #6b7280; font-size: 14px;">
+                <div>📍 Address: Gala no- 06, Pali industry estate, Wagdhara road, Near by jalaram temple, Dadra nagar, Dadra and Nagar Haveli, Gujarat, India</div>
+                <div>🕒 Business Hours: Mon-Fri 9:00 AM - 6:00 PM, Sat 9:00 AM - 2:00 PM</div>
+              </div>
+            </div>
+
+            <!-- Admin Signature -->
+            <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 30px;">
+              <p style="color: #6b7280; font-size: 14px; margin: 0 0 5px 0;">Best regards,</p>
+              <p style="color: #1f2937; font-weight: 600; margin: 0 0 5px 0;">${adminName}</p>
+              <p style="color: #6b7280; font-size: 14px; margin: 0;">Blow Pack Plastic Industries Team</p>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div style="background-color: #1f2937; color: #9ca3af; padding: 20px; text-align: center; font-size: 14px;">
+            <p style="margin: 0 0 10px 0;">© 2024 Blow Pack Plastic Industries. All rights reserved.</p>
+            <p style="margin: 0;">Thank you for choosing us for your plastic product needs!</p>
+          </div>
+        </div>
+      </body>
+      </html>
     `
   })
 };

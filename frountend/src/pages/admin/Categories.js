@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import AdminNavbar from '../../components/layout/AdminNavbar';
+import ImageUpload from '../../components/common/ImageUpload';
+import Button from '../../components/common/Button';
 import {
   PlusIcon,
   PencilIcon,
@@ -9,7 +11,8 @@ import {
   EyeSlashIcon,
   MagnifyingGlassIcon,
   FunnelIcon,
-  XMarkIcon
+  XMarkIcon,
+  PhotoIcon
 } from '@heroicons/react/24/outline';
 
 const AdminCategories = () => {
@@ -21,7 +24,11 @@ const AdminCategories = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [showModal, setShowModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [viewingCategory, setViewingCategory] = useState(null);
   const [editingCategory, setEditingCategory] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -70,23 +77,41 @@ const AdminCategories = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     try {
-      setLoading(true);
-      const token = localStorage.getItem('token');
+      setSubmitting(true);
+      setError(null);
       
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('Please login first');
+        return;
+      }
+
       const url = editingCategory 
         ? `/api/categories/${editingCategory._id}`
         : '/api/categories';
       
       const method = editingCategory ? 'PUT' : 'POST';
 
+      // Create FormData for image upload
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name || '');
+      formDataToSend.append('description', formData.description || '');
+      formDataToSend.append('sortOrder', formData.sortOrder || 0);
+      formDataToSend.append('isActive', formData.isActive.toString());
+
+      // Handle image upload
+      if (formData.image && formData.image.file) {
+        formDataToSend.append('image', formData.image.file);
+      }
+
       const response = await fetch(url, {
         method,
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: formDataToSend
       });
 
       if (!response.ok) {
@@ -94,6 +119,7 @@ const AdminCategories = () => {
         throw new Error(errorData.message || 'Failed to save category');
       }
 
+      // Success
       setShowModal(false);
       setEditingCategory(null);
       setFormData({
@@ -103,13 +129,20 @@ const AdminCategories = () => {
         sortOrder: 0,
         isActive: true
       });
+      setSuccessMessage(editingCategory ? 'Category updated successfully!' : 'Category created successfully!');
+      setTimeout(() => setSuccessMessage(null), 3000);
       fetchCategories();
     } catch (err) {
       console.error('Category save error:', err);
       setError(err.message);
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
+  };
+
+  const handleView = (category) => {
+    setViewingCategory(category);
+    setShowViewModal(true);
   };
 
   const handleEdit = (category) => {
@@ -117,7 +150,7 @@ const AdminCategories = () => {
     setFormData({
       name: category.name,
       description: category.description || '',
-      image: category.image || '',
+      image: category.image ? { url: category.image, isNew: false } : '',
       sortOrder: category.sortOrder || 0,
       isActive: category.isActive
     });
@@ -188,6 +221,20 @@ const AdminCategories = () => {
     (category.description && category.description.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+    
+    // Clear error when user starts typing
+    if (error) {
+      setError(null);
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       name: '',
@@ -198,6 +245,8 @@ const AdminCategories = () => {
     });
     setEditingCategory(null);
     setShowModal(false);
+    setError(null);
+    setSuccessMessage(null);
   };
 
   if (loading && categories.length === 0) {
@@ -217,18 +266,38 @@ const AdminCategories = () => {
       <AdminNavbar />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Success Message */}
+        {successMessage && (
+          <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-md">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-green-800">
+                  Success
+                </h3>
+                <div className="mt-2 text-sm text-green-700">
+                  {successMessage}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-5">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Categories</h1>
-              <p className="mt-2 text-gray-600">Manage product categories</p>
-            </div>
+              </div>
             <button
               onClick={() => setShowModal(true)}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
             >
-              <PlusIcon className="h-5 w-5 mr-2" />
+              <PlusIcon className="h-4 w-4 mr-2" />
               Add Category
             </button>
           </div>
@@ -239,24 +308,22 @@ const AdminCategories = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search */}
             <div className="relative">
-              <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
+             <input
                 type="text"
                 placeholder="Search categories..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+                className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                />
             </div>
 
             {/* Status Filter */}
             <div className="relative">
-              <FunnelIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <select
+             <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-              >
+                className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
@@ -269,9 +336,9 @@ const AdminCategories = () => {
                 setSearchTerm('');
                 setStatusFilter('all');
               }}
-              className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <XMarkIcon className="h-5 w-5 mr-2" />
+              className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+              
               Clear Filters
             </button>
           </div>
@@ -299,9 +366,7 @@ const AdminCategories = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Products
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Sort Order
-                  </th>
+                 
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
@@ -330,7 +395,7 @@ const AdminCategories = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900 max-w-xs truncate">
+                      <div className="text-sm text-gray-900 max-w-sm truncate">
                         {category.description || 'No description'}
                       </div>
                     </td>
@@ -339,9 +404,7 @@ const AdminCategories = () => {
                         {category.productCount || 0} products
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {category.sortOrder || 0}
-                    </td>
+                   
                     <td className="px-6 py-4 whitespace-nowrap">
                       <button
                         onClick={() => handleToggleStatus(category._id, category.isActive)}
@@ -356,10 +419,11 @@ const AdminCategories = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
+                       
                         <button
                           onClick={() => handleEdit(category)}
                           className="text-blue-600 hover:text-blue-900 p-1"
-                          title="Edit"
+                          title="Edit Category"
                         >
                           <PencilIcon className="h-4 w-4" />
                         </button>
@@ -373,7 +437,7 @@ const AdminCategories = () => {
                           title={category.isActive ? 'Deactivate' : 'Activate'}
                         >
                           {category.isActive ? (
-                            <EyeSlashIcon className="h-4 w-4" />
+                            <XMarkIcon className="h-4 w-4" />
                           ) : (
                             <EyeIcon className="h-4 w-4" />
                           )}
@@ -381,7 +445,7 @@ const AdminCategories = () => {
                         <button
                           onClick={() => handleDelete(category._id)}
                           className="text-red-600 hover:text-red-900 p-1"
-                          title="Delete"
+                          title="Delete Category"
                         >
                           <TrashIcon className="h-4 w-4" />
                         </button>
@@ -442,111 +506,114 @@ const AdminCategories = () => {
           )}
         </div>
 
-        {/* Add/Edit Modal */}
+        {/* Add/Edit Modal - Enhanced */}
         {showModal && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-              <div className="mt-3">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-medium text-gray-900">
-                    {editingCategory ? 'Edit Category' : 'Add New Category'}
-                  </h3>
-                  <button
-                    onClick={resetForm}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    <XMarkIcon className="h-6 w-6" />
-                  </button>
-                </div>
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 ">
+            <div className="relative top-8 mx-auto p-4 border w-11/12 md:w-1/3 lg:w-1/4 shadow-lg rounded-lg bg-white min-h-[300px]">
+              <div className="flex justify-between items-center mb-3 ">
+                <h3 className="text-base font-semibold text-gray-900">
+                  {editingCategory ? 'Edit Category' : 'Add New Category'}
+                </h3>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <button
+                  onClick={resetForm}
+                  className="text-gray-400 hover:text-gray-600 p-1"
+                >
+                  <XMarkIcon className="h-4 w-4" />
+                </button>
+              </div>
+
+              {error && (
+                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <h3 className="text-sm font-medium text-red-800">
+                        Error
+                      </h3>
+                      <div className="mt-2 text-sm text-red-700">
+                        {error}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-1">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
                       Category Name *
                     </label>
                     <input
                       type="text"
+                      name="name"
                       required
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      onChange={handleInputChange}
+                      className="input-field py-2 h-10"
                       placeholder="Enter category name"
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Description
-                    </label>
-                    <textarea
-                      value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Enter category description"
-                    />
-                  </div>
+                  
+                </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Image URL
-                    </label>
-                    <input
-                      type="url"
-                      value={formData.image}
-                      onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Enter image URL"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    rows={2}
+                    className="input-field resize-none py-2"
+                    placeholder="Enter category description"
+                  />
+                </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Sort Order
-                    </label>
-                    <input
-                      type="number"
-                      value={formData.sortOrder}
-                      onChange={(e) => setFormData({ ...formData, sortOrder: parseInt(e.target.value) || 0 })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="0"
-                    />
-                  </div>
+                
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="isActive"
+                    checked={formData.isActive}
+                    onChange={handleInputChange}
+                    className="h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <span className="ml-1 text-xs font-medium text-gray-700">Active</span>
+                </div>
 
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="isActive"
-                      checked={formData.isActive}
-                      onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">
-                      Active
-                    </label>
-                  </div>
+                <div className="flex justify-end space-x-3 pt-3">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="md"
+                    onClick={resetForm}
+                  >
+                    Cancel
+                  </Button>
 
-                  <div className="flex justify-end space-x-3 pt-4">
-                    <button
-                      type="button"
-                      onClick={resetForm}
-                      className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-                    >
-                      {loading ? 'Saving...' : editingCategory ? 'Update' : 'Create'}
-                    </button>
-                  </div>
-                </form>
-              </div>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    size="md"
+                    disabled={submitting}
+                    loading={submitting}
+                  >
+                    {editingCategory ? 'Update Category' : 'Add Category'}
+                  </Button>
+                </div>
+              </form>
             </div>
           </div>
         )}
+
       </div>
     </>
   );

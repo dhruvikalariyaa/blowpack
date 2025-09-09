@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import AdminNavbar from "../../components/layout/AdminNavbar";
 import ImageUpload from "../../components/common/ImageUpload";
+import Button from "../../components/common/Button";
 import { API_ENDPOINTS } from "../../config/api";
 import {
   PlusIcon,
@@ -12,6 +13,13 @@ import {
   FunnelIcon,
   XMarkIcon,
   PhotoIcon,
+  CurrencyDollarIcon,
+  ShoppingBagIcon,
+  CheckIcon,
+  StarIcon,
+  TagIcon,
+  CalendarIcon,
+  ChartBarIcon
 } from "@heroicons/react/24/outline";
 
 const AdminProducts = () => {
@@ -23,6 +31,7 @@ const AdminProducts = () => {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [viewingProduct, setViewingProduct] = useState(null);
@@ -77,6 +86,7 @@ const AdminProducts = () => {
       const data = await response.json();
       setProducts(data.data.products);
       setTotalPages(data.data.pagination.totalPages);
+      setTotalProducts(data.data.pagination.totalItems);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -353,11 +363,11 @@ const AdminProducts = () => {
         )}
 
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-5">
           <div className="flex justify-between items-center">
-            <div>
+            <div className="flex items-center space-x-4">
               <h1 className="text-3xl font-bold text-gray-900">Products</h1>
-              <p className="mt-2 text-gray-600">Manage your product catalog</p>
+              
             </div>
             <button
               onClick={() => setShowModal(true)}
@@ -561,6 +571,10 @@ const AdminProducts = () => {
             <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm text-gray-700">
+                  Showing <span className="font-medium">{products.length}</span> of{" "}
+                  <span className="font-medium">{totalProducts || 0}</span> products
+                </p>
+                <p className="text-xs text-gray-500">
                   Page <span className="font-medium">{currentPage}</span> of{" "}
                   <span className="font-medium">{totalPages}</span>
                 </p>
@@ -577,6 +591,48 @@ const AdminProducts = () => {
                   >
                     Previous
                   </button>
+                  
+                  {/* Page Numbers */}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                    // Show first page, last page, current page, and pages around current page
+                    const shouldShow = 
+                      page === 1 || 
+                      page === totalPages || 
+                      (page >= currentPage - 1 && page <= currentPage + 1);
+                    
+                    if (!shouldShow) {
+                      // Show ellipsis for gaps
+                      if (page === 2 && currentPage > 4) {
+                        return (
+                          <span key={`ellipsis-${page}`} className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500">
+                            ...
+                          </span>
+                        );
+                      }
+                      if (page === totalPages - 1 && currentPage < totalPages - 3) {
+                        return (
+                          <span key={`ellipsis-${page}`} className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500">
+                            ...
+                          </span>
+                        );
+                      }
+                      return null;
+                    }
+                    
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`relative inline-flex items-center px-3 py-2 border text-sm font-medium ${
+                          page === currentPage
+                            ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  })}
 
                   <button
                     onClick={() =>
@@ -593,21 +649,21 @@ const AdminProducts = () => {
           </div>
         </div>
 
-        {/* Product Modal */}
+        {/* Product Modal - Ultra Compact */}
 
         {showModal && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium text-gray-900">
-                  {editingProduct ? "Edit Product" : "Add New Product"}
+            <div className="relative top-12 mx-auto p-3 border w-11/12 md:w-1/2 lg:w-2/5 shadow-lg rounded-lg bg-white">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-base font-semibold text-gray-900">
+                  {editingProduct ? "Edit Product" : "Add Product"}
                 </h3>
 
                 <button
                   onClick={resetForm}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-gray-600 p-1"
                 >
-                  <XMarkIcon className="h-6 w-6" />
+                  <XMarkIcon className="h-4 w-4" />
                 </button>
               </div>
 
@@ -631,67 +687,61 @@ const AdminProducts = () => {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <form onSubmit={handleSubmit} className="space-y-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
                       Product Name
                     </label>
-
                     <input
                       type="text"
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="Enter product name"
+                      className="input-field py-2 h-10"
+                      placeholder="Product name"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
                       SKU
                     </label>
-
                     <input
                       type="text"
                       name="sku"
                       value={formData.sku}
                       onChange={handleInputChange}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="Enter product SKU"
+                      className="input-field py-2 h-10"
+                      placeholder="Product SKU"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
                       Price (₹)
                     </label>
-
                     <input
                       type="number"
                       name="price"
                       value={formData.price}
                       onChange={handleInputChange}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="Enter price (₹)"
+                      className="input-field py-2 h-10"
+                      placeholder="Price"
                     />
                   </div>
 
-
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
                       Category
                     </label>
-
                     <select
                       name="category"
                       value={formData.category}
                       onChange={handleInputChange}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="input-field py-2 h-10"
                     >
                       <option value="">Select Category</option>
-
                       {categories.map((category) => (
                         <option key={category._id} value={category._id}>
                           {category.name}
@@ -702,25 +752,23 @@ const AdminProducts = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
                     Description
                   </label>
-
                   <textarea
                     name="description"
                     value={formData.description}
                     onChange={handleInputChange}
-                    rows={3}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Enter product description"
+                    rows={2}
+                    className="input-field resize-none py-2"
+                    placeholder="Product description"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
                     Product Images
                   </label>
-
                   <ImageUpload
                     images={formData.images}
                     onImagesChange={(images) =>
@@ -738,10 +786,9 @@ const AdminProducts = () => {
                       name="isActive"
                       checked={formData.isActive}
                       onChange={handleInputChange}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className="h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     />
-
-                    <span className="ml-2 text-sm text-gray-700">Active</span>
+                    <span className="ml-1 text-xs font-medium text-gray-700">Active</span>
                   </label>
 
                   <label className="flex items-center">
@@ -750,336 +797,186 @@ const AdminProducts = () => {
                       name="isFeatured"
                       checked={formData.isFeatured}
                       onChange={handleInputChange}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className="h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     />
-
-                    <span className="ml-2 text-sm text-gray-700">Featured</span>
+                    <span className="ml-1 text-xs font-medium text-gray-700">Featured</span>
                   </label>
                 </div>
 
-                <div className="flex justify-end space-x-3 pt-4">
-                  <button
+                <div className="flex justify-end space-x-3 pt-3">
+                  <Button
                     type="button"
+                    variant="secondary"
+                    size="md"
                     onClick={resetForm}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                   >
                     Cancel
-                  </button>
+                  </Button>
 
-                  <button
+                  <Button
                     type="submit"
+                    variant="primary"
+                    size="md"
                     disabled={submitting}
-                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    loading={submitting}
                   >
-                    {submitting ? "Saving..." : (editingProduct ? "Update Product" : "Add Product")}
-                  </button>
+                    {editingProduct ? "Update Product" : "Add Product"}
+                  </Button>
                 </div>
               </form>
             </div>
           </div>
         )}
 
-        {/* View Product Modal - Modern & Aesthetic */}
-
+        {/* Product Details Modal */}
         {showViewModal && viewingProduct && (
-          <div className="fixed inset-0 bg-black bg-opacity-60 overflow-y-auto h-full w-full z-50 animate-fadeIn">
-            <div className="relative top-4 mx-auto p-4 w-11/12 max-w-6xl shadow-2xl rounded-2xl bg-white animate-slideIn">
-              {/* Header with Gradient Background */}
-
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-t-2xl p-6 text-white">
+          <div className="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+              {/* Header */}
+              <div className="bg-blue-100 px-6 py-4 text-gray-900">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-3xl font-bold mb-2">
-                      {viewingProduct.name}
-                    </h3>
-
-                    <p className="text-blue-100 text-lg">
-                      {viewingProduct.category?.name || "Uncategorized"}
-                    </p>
+                    <h2 className="text-xl font-bold">Product Details - {viewingProduct.name}</h2>
+                    <p className="text-gray-900 text-sm">SKU: {viewingProduct.sku} • Created: {new Date(viewingProduct.createdAt).toLocaleDateString()}</p>
                   </div>
-
                   <button
                     onClick={() => setShowViewModal(false)}
-                    className="text-white hover:text-gray-200 transition-colors p-2 hover:bg-white hover:bg-opacity-20 rounded-full"
+                    className="p-2 hover:bg-blue-300 rounded-full transition-colors"
                   >
-                    <XMarkIcon className="h-6 w-6" />
+                    <XMarkIcon className="h-5 w-5" />
                   </button>
                 </div>
               </div>
 
-              <div className="p-8">
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                  {/* Product Images - Enhanced Gallery */}
+              {/* Content */}
+              <div className="p-6 space-y-6 overflow-y-auto max-h-[calc(90vh-100px)]">
+              
 
-                  <div className="space-y-6">
-                    <div className="flex items-center space-x-2 mb-4">
-                      <div className="w-1 h-8 bg-gradient-to-b from-blue-600 to-purple-600 rounded-full"></div>
-
-                      <h4 className="text-2xl font-bold text-gray-900">
-                        Product Gallery
-                      </h4>
-                    </div>
-
-                    {viewingProduct.images &&
-                    viewingProduct.images.length > 0 ? (
-                      <div className="space-y-4">
+                {/* Product Images & Basic Info */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Product Images */}
+                  <div className="bg-pink-50 rounded-xl p-4 border border-pink-200">
+                    <h3 className="text-sm font-semibold text-gray-600 mb-3">Product Images ({viewingProduct.images?.length || 0})</h3>
+                    {viewingProduct.images && viewingProduct.images.length > 0 ? (
+                      <div className="space-y-3">
                         {/* Main Image */}
-
-                        <div className="relative group">
+                        <div className="relative">
                           <img
-                            src={
-                              viewingProduct.images[0].url ||
-                              viewingProduct.images[0]
-                            }
-                            alt={
-                              viewingProduct.images[0].alt ||
-                              viewingProduct.name
-                            }
-                            className="w-full h-80 object-cover rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300"
+                            src={viewingProduct.images[0].url || viewingProduct.images[0]}
+                            alt={viewingProduct.images[0].alt || viewingProduct.name}
+                            className="w-full h-64 object-cover rounded-lg border border-pink-200"
                           />
-
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 rounded-xl"></div>
+                          {viewingProduct.images.length > 1 && (
+                            <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
+                              1 of {viewingProduct.images.length}
+                            </div>
+                          )}
                         </div>
-
                         {/* Thumbnail Grid */}
-
                         {viewingProduct.images.length > 1 && (
-                          <div className="grid grid-cols-4 gap-3">
-                            {viewingProduct.images
-                              .slice(1)
-                              .map((image, index) => (
-                                <div
-                                  key={index}
-                                  className="relative group cursor-pointer"
-                                >
-                                  <img
-                                    src={image.url || image}
-                                    alt={image.alt || viewingProduct.name}
-                                    className="w-full h-20 object-cover rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300"
-                                  />
-
-                                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 rounded-lg"></div>
-                                </div>
-                              ))}
+                          <div className="grid grid-cols-4 gap-2">
+                            {viewingProduct.images.slice(1).map((image, index) => (
+                              <img
+                                key={index}
+                                src={image.url || image}
+                                alt={image.alt || viewingProduct.name}
+                                className="w-full h-16 object-cover rounded border border-pink-200 hover:border-pink-400 cursor-pointer"
+                              />
+                            ))}
                           </div>
                         )}
                       </div>
                     ) : (
-                      <div className="w-full h-80 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center">
+                      <div className="w-full h-64 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
                         <div className="text-center">
-                          <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <PhotoIcon className="h-8 w-8 text-gray-500" />
-                          </div>
-
-                          <p className="text-gray-500 text-lg">
-                            No images available
-                          </p>
+                          <PhotoIcon className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                          <p className="text-gray-500 text-sm">No images available</p>
                         </div>
                       </div>
                     )}
                   </div>
 
-                  {/* Product Information - Enhanced Cards */}
-
-                  <div className="space-y-6">
-                    {/* Basic Information Card */}
-
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
-                      <div className="flex items-center space-x-2 mb-4">
-                        <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">
-                            i
-                          </span>
-                        </div>
-
-                        <h4 className="text-xl font-bold text-gray-900">
-                          Basic Information
-                        </h4>
+                  {/* Product Information */}
+                  <div className="bg-orange-50 rounded-xl p-4 border border-orange-200">
+                    <h3 className="text-sm font-semibold text-gray-600 mb-3">Product Information</h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500 text-sm">Name:</span>
+                        <span className="font-medium text-gray-700">{viewingProduct.name}</span>
                       </div>
-
-                      <div className="space-y-4">
-                        <div className="bg-white rounded-lg p-4 shadow-sm">
-                          <label className="block text-sm font-semibold text-gray-600 mb-1">
-                            Product Name
-                          </label>
-
-                          <p className="text-lg font-medium text-gray-900">
-                            {viewingProduct.name}
-                          </p>
-                        </div>
-
-                        <div className="bg-white rounded-lg p-4 shadow-sm">
-                          <label className="block text-sm font-semibold text-gray-600 mb-1">
-                            SKU
-                          </label>
-
-                          <p className="text-lg font-mono text-gray-900">
-                            {viewingProduct.sku}
-                          </p>
-                        </div>
-
-                        <div className="bg-white rounded-lg p-4 shadow-sm">
-                          <label className="block text-sm font-semibold text-gray-600 mb-1">
-                            Description
-                          </label>
-
-                          <p className="text-gray-900 leading-relaxed">
-                            {viewingProduct.description}
-                          </p>
-                        </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500 text-sm">SKU:</span>
+                        <span className="text-gray-600 font-mono text-sm">{viewingProduct.sku}</span>
                       </div>
-                    </div>
-
-                    {/* Pricing & Inventory Card */}
-
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
-                      <div className="flex items-center space-x-2 mb-4">
-                        <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">
-                            ₹
-                          </span>
-                        </div>
-
-                        <h4 className="text-xl font-bold text-gray-900">
-                          Pricing & Inventory
-                        </h4>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500 text-sm">Category:</span>
+                        <span className="text-gray-600">{viewingProduct.category?.name || 'Uncategorized'}</span>
                       </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-white rounded-lg p-4 shadow-sm text-center">
-                          <label className="block text-sm font-semibold text-gray-600 mb-2">
-                            Price
-                          </label>
-
-                          <p className="text-3xl font-bold text-green-600">
-                            ₹{viewingProduct.price}
-                          </p>
-                        </div>
-
+                      <div className="flex justify-between">
+                        <span className="text-gray-500 text-sm">Price:</span>
+                        <span className="text-gray-600 font-bold">₹{viewingProduct.price}</span>
                       </div>
-                    </div>
-
-                    {/* Status Card */}
-
-                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
-                      <div className="flex items-center space-x-2 mb-4">
-                        <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">
-                            ✓
-                          </span>
-                        </div>
-
-                        <h4 className="text-xl font-bold text-gray-900">
-                          Status
-                        </h4>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500 text-sm">Status:</span>
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          viewingProduct.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }`}>
+                          {viewingProduct.isActive ? 'Active' : 'Inactive'}
+                        </span>
                       </div>
-
-                      <div className="flex space-x-4">
-                        <div className="flex-1 bg-white rounded-lg p-4 shadow-sm text-center">
-                          <span
-                            className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-bold ${
-                              viewingProduct.isActive
-                                ? "bg-green-100 text-green-800 border-2 border-green-200"
-                                : "bg-red-100 text-red-800 border-2 border-red-200"
-                            }`}
-                          >
-                            <div
-                              className={`w-2 h-2 rounded-full mr-2 ${
-                                viewingProduct.isActive
-                                  ? "bg-green-500"
-                                  : "bg-red-500"
-                              }`}
-                            ></div>
-
-                            {viewingProduct.isActive ? "Active" : "Inactive"}
-                          </span>
-                        </div>
-
-                        <div className="flex-1 bg-white rounded-lg p-4 shadow-sm text-center">
-                          <span
-                            className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-bold ${
-                              viewingProduct.isFeatured
-                                ? "bg-blue-100 text-blue-800 border-2 border-blue-200"
-                                : "bg-gray-100 text-gray-800 border-2 border-gray-200"
-                            }`}
-                          >
-                            <div
-                              className={`w-2 h-2 rounded-full mr-2 ${
-                                viewingProduct.isFeatured
-                                  ? "bg-blue-500"
-                                  : "bg-gray-500"
-                              }`}
-                            ></div>
-
-                            {viewingProduct.isFeatured ? "Featured" : "Regular"}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Additional Information Card */}
-
-                    <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl p-6 border border-gray-100">
-                      <div className="flex items-center space-x-2 mb-4">
-                        <div className="w-8 h-8 bg-gray-500 rounded-lg flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">
-                            ℹ
-                          </span>
-                        </div>
-
-                        <h4 className="text-xl font-bold text-gray-900">
-                          Additional Information
-                        </h4>
-                      </div>
-
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                          <span className="font-semibold text-gray-600">
-                            Created
-                          </span>
-
-                          <span className="text-gray-900">
-                            {new Date(
-                              viewingProduct.createdAt
-                            ).toLocaleDateString()}
-                          </span>
-                        </div>
-
-                        <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                          <span className="font-semibold text-gray-600">
-                            Last Updated
-                          </span>
-
-                          <span className="text-gray-900">
-                            {new Date(
-                              viewingProduct.updatedAt
-                            ).toLocaleDateString()}
-                          </span>
-                        </div>
-
-                        <div className="flex justify-between items-center py-2">
-                          <span className="font-semibold text-gray-600">
-                            Product ID
-                          </span>
-
-                          <span className="text-gray-500 font-mono text-sm">
-                            {viewingProduct._id}
-                          </span>
-                        </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500 text-sm">Featured:</span>
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          viewingProduct.isFeatured ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {viewingProduct.isFeatured ? 'Yes' : 'No'}
+                        </span>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Enhanced Footer */}
+                {/* Product Description */}
+                <div className="bg-indigo-50 rounded-xl p-4 border border-indigo-200">
+                  <h3 className="text-sm font-semibold text-gray-600 mb-3">Product Description</h3>
+                  <div className="text-sm text-gray-700">
+                    {viewingProduct.description || 'No description available for this product.'}
+                  </div>
+                </div>
 
-                <div className="mt-8 flex justify-end space-x-4">
-                  <button
-                    onClick={() => setShowViewModal(false)}
-                    className="px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl hover:from-gray-600 hover:to-gray-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                  >
-                    Close
-                  </button>
+                {/* Product Timeline */}
+                <div className="bg-teal-50 rounded-xl p-4 border border-teal-200">
+                  <h3 className="text-sm font-semibold text-gray-600 mb-3">Product Timeline</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-green-400 rounded-full mr-3"></div>
+                      <div className="text-sm">
+                        <p className="font-medium text-gray-700">Product Created</p>
+                        <p className="text-gray-500 text-xs">{new Date(viewingProduct.createdAt).toLocaleDateString('en-IN', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}</p>
+                      </div>
+                    </div>
+                    {viewingProduct.updatedAt && viewingProduct.updatedAt !== viewingProduct.createdAt && (
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 bg-blue-400 rounded-full mr-3"></div>
+                        <div className="text-sm">
+                          <p className="font-medium text-gray-700">Last Updated</p>
+                          <p className="text-gray-500 text-xs">{new Date(viewingProduct.updatedAt).toLocaleDateString('en-IN', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
