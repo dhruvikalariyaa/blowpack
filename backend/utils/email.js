@@ -692,6 +692,100 @@ const emailTemplates = {
     `
   }),
 
+  emailVerification: (userName, otp) => ({
+    subject: '📧 Verify Your Email Address - Packwell Plastic Industries',
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Email Verification</title>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); padding: 30px; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">Packwell Plastic Industries</h1>
+            <p style="color: #e0e7ff; margin: 5px 0 0 0; font-size: 16px;">Quality Plastic Products</p>
+          </div>
+
+          <!-- Main Content -->
+          <div style="padding: 40px 30px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <div style="background-color: #3b82f6; color: white; padding: 15px 30px; border-radius: 50px; display: inline-block; font-size: 18px; font-weight: 600;">
+                📧 Email Verification
+              </div>
+            </div>
+
+            <h2 style="color: #1f2937; font-size: 24px; margin: 0 0 20px 0; text-align: center;">Verify Your Email Address</h2>
+            
+            <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">Dear <strong>${userName}</strong>,</p>
+            
+            <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 30px 0;">Thank you for registering with Packwell Plastic Industries! To complete your account setup and ensure you receive important updates about your orders, please verify your email address using the verification code below.</p>
+
+            <!-- OTP Code Card -->
+            <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; border-radius: 12px; padding: 30px; margin: 30px 0; text-align: center;">
+              <h3 style="color: #ffffff; font-size: 20px; margin: 0 0 20px 0;">Your Verification Code</h3>
+              <div style="background-color: rgba(255, 255, 255, 0.2); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 8px; padding: 20px; margin: 20px 0;">
+                <div style="font-size: 36px; font-weight: 700; letter-spacing: 8px; color: #ffffff;">${otp}</div>
+              </div>
+              <p style="color: #e0e7ff; margin: 0; font-size: 14px;">This code will expire in 10 minutes</p>
+            </div>
+
+            <!-- Instructions -->
+            <div style="background-color: #f0f9ff; border-left: 4px solid #3b82f6; padding: 20px; margin: 30px 0; border-radius: 0 8px 8px 0;">
+              <h4 style="color: #1e40af; margin: 0 0 15px 0; font-size: 16px;">📝 How to Verify:</h4>
+              <ol style="color: #1e40af; margin: 0; padding-left: 20px;">
+                <li>Go to your profile page in the app</li>
+                <li>Click on "Verify Now" button</li>
+                <li>Enter the 6-digit code shown above</li>
+                <li>Click "Verify Email" to complete the process</li>
+              </ol>
+            </div>
+
+            <!-- Security Note -->
+            <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 30px 0; border-radius: 0 8px 8px 0;">
+              <h4 style="color: #92400e; margin: 0 0 10px 0; font-size: 16px;">🔒 Security Note:</h4>
+              <ul style="color: #92400e; margin: 0; padding-left: 20px;">
+                <li>Never share this verification code with anyone</li>
+                <li>Our team will never ask for your verification code</li>
+                <li>If you didn't request this verification, please ignore this email</li>
+                <li>The code will automatically expire after 10 minutes</li>
+              </ul>
+            </div>
+
+            <!-- Benefits -->
+            <div style="background-color: #f0fdf4; border-left: 4px solid #10b981; padding: 20px; margin: 30px 0; border-radius: 0 8px 8px 0;">
+              <h4 style="color: #065f46; margin: 0 0 15px 0; font-size: 16px;">✅ Benefits of Verified Email:</h4>
+              <ul style="color: #065f46; margin: 0; padding-left: 20px;">
+                <li>Receive order confirmations and updates</li>
+                <li>Get shipping notifications and tracking details</li>
+                <li>Access to exclusive offers and promotions</li>
+                <li>Secure password reset functionality</li>
+                <li>Important account security alerts</li>
+              </ul>
+            </div>
+
+            <!-- Contact Info -->
+            <div style="text-align: center; margin: 40px 0 20px 0; padding: 20px; background-color: #f8fafc; border-radius: 8px;">
+              <p style="color: #6b7280; margin: 0 0 10px 0; font-size: 14px;">Need help? Contact our support team</p>
+              <p style="color: #1f2937; margin: 0; font-weight: 600;">📞 +91 9876543210 | 📧 support@packwellplastic.com</p>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div style="background-color: #1f2937; color: #9ca3af; padding: 20px; text-align: center; font-size: 14px;">
+            <p style="margin: 0 0 10px 0;">© 2024 Packwell Plastic Industries. All rights reserved.</p>
+            <p style="margin: 0;">Thank you for choosing us for your plastic product needs!</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+  }),
+
   newOrderNotification: (order, user, orderItems) => ({
     subject: `🚨 New Order Received - ${order.orderNumber} | Packwell Plastic Industries`,
     html: `

@@ -34,30 +34,30 @@ const About = () => {
   ];
 
   const milestones = [
-    { year: '1998', title: 'Company Founded', description: 'Started as a small plastic manufacturing unit' },
-    { year: '2005', title: 'First Major Contract', description: 'Secured our first major industrial contract' },
-    { year: '2010', title: 'Expansion', description: 'Expanded operations to 5 cities across India' },
-    { year: '2015', title: 'Digital Transformation', description: 'Launched our online platform for better customer service' },
-    { year: '2020', title: 'Sustainability Initiative', description: 'Introduced eco-friendly manufacturing processes' },
-    { year: '2023', title: 'Present', description: 'Serving 10,000+ customers with 500+ products' }
+    { year: '2016', title: 'Company Founded', description: 'Started as a small plastic manufacturing unit' },
+    { year: '2017', title: 'First Major Contract', description: 'Secured our first major industrial contract' },
+    { year: '2018', title: 'Expansion', description: 'Expanded operations to 10 cities across India' },
+    { year: '2019', title: 'Digital Transformation', description: 'Launched our online platform for better customer service' },
+    { year: '2023', title: 'Sustainability Initiative', description: 'Make large contract with large company' },
+    { year: '2025', title: 'Present', description: 'Serving 500+ customers with 100+ products' }
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       <Helmet>
         <title>About Us - Blow Pack Plastic Industries</title>
         <meta name="description" content="Learn about Blow Pack Plastic Industries - a leading manufacturer of high-quality plastic products with 25+ years of experience." />
       </Helmet>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20">
+      <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            <h1 className="text-3xl md:text-4xl font-bold mb-3">
               About Blow Pack Plastic
             </h1>
-            <p className="text-xl md:text-2xl text-primary-100 max-w-3xl mx-auto">
-              Leading the plastic industry with innovation, quality, and customer satisfaction for over 25 years
+            <p className="text-lg text-primary-100 max-w-3xl mx-auto">
+              Leading the plastic industry with innovation, quality, and customer satisfaction.
             </p>
           </div>
         </div>
@@ -71,36 +71,28 @@ const About = () => {
               <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Story</h2>
               <div className="space-y-4 text-gray-600">
                 <p>
-                  Founded in 1998, Packwell Plastic Industries began as a small family business 
-                  with a vision to provide high-quality plastic products to the Indian market. 
-                  What started as a modest operation has grown into one of the most trusted names 
-                  in the plastic manufacturing industry.
+                At<b> Blow Pack Plastic</b>, our journey began with a simple vision – to provide innovative, durable, and eco-friendly plastic packaging solutions that meet the growing demands of modern industries. What started as a small initiative has now grown into a trusted name in the plastic manufacturing sector.
                 </p>
                 <p>
-                  Over the years, we have continuously evolved, adopting new technologies and 
-                  manufacturing processes to meet the changing needs of our customers. Today, 
-                  we serve thousands of customers across India with our comprehensive range of 
-                  plastic products.
+                With years of experience, advanced technology, and a commitment to quality, we specialize in producing high-performance plastic products that serve diverse needs – from household to industrial use. Our passion lies in creating solutions that not only add value to businesses but also contribute to sustainability by focusing on recyclable and safe materials.
                 </p>
                 <p>
-                  Our commitment to quality, innovation, and customer satisfaction has been the 
-                  driving force behind our success. We believe in building long-term relationships 
-                  with our customers by delivering products that exceed their expectations.
+                Every product we manufacture is a reflection of our dedication, innovation, and responsibility towards our customers and the environment. At Blow Pack Plastic, we believe in building long-term relationships through trust, reliability, and excellence.
                 </p>
               </div>
             </div>
             <div className="bg-gray-100 rounded-lg p-8">
               <div className="grid grid-cols-2 gap-6">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-primary-600 mb-2">25+</div>
+                  <div className="text-3xl font-bold text-primary-600 mb-2">9+</div>
                   <div className="text-gray-600">Years Experience</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-primary-600 mb-2">10,000+</div>
+                  <div className="text-3xl font-bold text-primary-600 mb-2">500+</div>
                   <div className="text-gray-600">Happy Customers</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-primary-600 mb-2">500+</div>
+                  <div className="text-3xl font-bold text-primary-600 mb-2">100+</div>
                   <div className="text-gray-600">Products</div>
                 </div>
                 <div className="text-center">
@@ -114,7 +106,7 @@ const About = () => {
       </section>
 
       {/* Our Values */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-5 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Values</h2>
@@ -158,7 +150,7 @@ const About = () => {
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                       <div className="text-primary-600 font-bold text-lg mb-2">{milestone.year}</div>
                       <h3 className="text-xl font-semibold text-gray-900 mb-2">{milestone.title}</h3>
-                      <p className="text-gray-600">{milestone.description}</p>
+                      <p className="text-gray-600 text-sm">{milestone.description}</p>
                     </div>
                   </div>
                   <div className="w-1/2 flex justify-center">
@@ -203,13 +195,13 @@ const About = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-primary-600 text-white">
+      <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Work With Us?</h2>
-          <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of satisfied customers who trust Packwell Plastic for their plastic product needs
+          <h2 className="text-3xl md:text-4xl font-bold mb-3">Ready to Work With Us?</h2>
+          <p className="text-lg text-primary-100 max-w-3xl mx-auto">
+              Join thousands of satisfied customers who trust blowpackplastic for their plastic product.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-4">
             <a
               href="/products"
               className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-primary-600 bg-white hover:bg-gray-100 transition-colors"

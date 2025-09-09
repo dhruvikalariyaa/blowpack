@@ -932,8 +932,8 @@ const Checkout = () => {
 
       {/* Confirmation Modal */}
       {showConfirmModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full transform animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl max-w-lg w-full transform animate-in zoom-in-95 duration-300 border border-white/20">
             {/* Header */}
             <div className="relative px-8 pt-8 pb-4">
               <div className="flex items-center justify-center w-16 h-16 mx-auto mb-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg">

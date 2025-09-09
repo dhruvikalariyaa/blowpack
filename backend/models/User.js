@@ -48,11 +48,11 @@ const userSchema = new mongoose.Schema({
   addresses: [{
     name: {
       type: String,
-      required: true
+      required: false
     },
     phone: {
       type: String,
-      required: true
+      required: false
     },
     address: {
       type: String,
@@ -86,7 +86,12 @@ const userSchema = new mongoose.Schema({
   resetPasswordToken: String,
   resetPasswordExpire: Date,
   emailVerificationToken: String,
-  emailVerificationExpire: Date
+  emailVerificationExpire: Date,
+  emailVerificationOTP: String,
+  profileImage: {
+    public_id: String,
+    url: String
+  }
 }, {
   timestamps: true
 });
@@ -117,6 +122,7 @@ userSchema.methods.getPublicProfile = function() {
   delete userObject.resetPasswordExpire;
   delete userObject.emailVerificationToken;
   delete userObject.emailVerificationExpire;
+  delete userObject.emailVerificationOTP;
   return userObject;
 };
 

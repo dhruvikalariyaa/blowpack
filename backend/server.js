@@ -89,8 +89,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler
+// 404 handler - catch all unmatched routes
 app.use('*', (req, res) => {
+  console.log(`404 - Route not found: ${req.method} ${req.originalUrl}`);
   res.status(404).json({
     success: false,
     message: 'API endpoint not found'

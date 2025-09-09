@@ -132,29 +132,51 @@ const Register = () => {
           </div>
         </div>
 
-        <div className="mt-4 sm:mx-auto sm:w-full sm:max-w-lg animate-slideInUp">
+        <div className="mt-4 sm:mx-auto sm:w-full sm:max-w-2xl animate-slideInUp">
           <div className="auth-card">
             <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
-              <div className="space-y-2">
-                <div>
-                  <Input
-                    label="Full Name"
-                    type="text"
-                    name="name"
-                    register={register}
-                    validation={{
-                      required: 'Full name is required',
-                      minLength: {
-                        value: 2,
-                        message: 'Name must be at least 2 characters'
-                      }
-                    }}
-                    error={errors.name?.message}
-                    placeholder="Enter your full name"
-                    className="input-field"
-                  />
-                </div>
+              <div className="space-y-2 mt-2">
+                
 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <div>
+                    <Input
+                      label="Name"
+                      type="text"
+                      name="name"
+                      register={register}
+                      validation={{
+                        required: 'Full name is required',
+                        minLength: {
+                          value: 2,
+                          message: 'Name must be at least 2 characters'
+                        }
+                      }}
+                      error={errors.name?.message}
+                      placeholder="Enter your full name"
+                      className="input-field mt-2"
+                    />
+                  </div>
+
+                  <div>
+                    <Input
+                      label="Phone Number"
+                      type="tel"
+                      name="phone"
+                      register={register}
+                      validation={{
+                        required: 'Phone number is required',
+                        pattern: {
+                          value: /^[6-9]\d{9}$/,
+                          message: 'Please enter a valid 10-digit phone number'
+                        }
+                      }}
+                      error={errors.phone?.message}
+                      placeholder="Enter your phone number"
+                      className="input-field mt-2"
+                    />
+                  </div>
+                </div>
                 <div>
                   <Input
                     label="Email Address"
@@ -170,97 +192,81 @@ const Register = () => {
                     }}
                     error={errors.email?.message}
                     placeholder="Enter your email address"
-                    className="input-field"
+                    className="input-field mt-2"
                   />
                 </div>
 
-                <div>
-                  <Input
-                    label="Phone Number"
-                    type="tel"
-                    name="phone"
-                    register={register}
-                    validation={{
-                      required: 'Phone number is required',
-                      pattern: {
-                        value: /^[6-9]\d{9}$/,
-                        message: 'Please enter a valid 10-digit phone number'
-                      }
-                    }}
-                    error={errors.phone?.message}
-                    placeholder="Enter your phone number"
-                    className="input-field"
-                  />
-                </div>
-
-                <div>
-                  <div className="relative">
-                    <Input
-                      label="Password"
-                      type={showPassword ? 'text' : 'password'}
-                      name="password"
-                      register={register}
-                      validation={{
-                        required: 'Password is required',
-                        minLength: {
-                          value: 6,
-                          message: 'Password must be at least 6 characters'
-                        },
-                        pattern: {
-                          value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-                          message: 'Password must contain at least one uppercase letter, one lowercase letter, and one number'
-                        }
-                      }}
-                      error={errors.password?.message}
-                      placeholder="Create a strong password"
-                      className="input-field pr-12"
-                    />
-                    <button
-                      type="button"
-                      className="absolute top-1/2 right-0 pr-3 transform -translate-y-1/2 flex items-center justify-center group"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeSlashIcon className="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                      ) : (
-                        <EyeIcon className="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                      )}
-                    </button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <div>
+                    <div className="relative">
+                      <Input
+                        label="Password"
+                        type={showPassword ? 'text' : 'password'}
+                        name="password"
+                        register={register}
+                        validation={{
+                          required: 'Password is required',
+                          minLength: {
+                            value: 6,
+                            message: 'Password must be at least 6 characters'
+                          },
+                          pattern: {
+                            value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+                            message: 'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+                          }
+                        }}
+                        error={errors.password?.message}
+                        placeholder="Create a strong password"
+                        className="input-field pr-12 mt-2"
+                      />
+                      <button
+                        type="button"
+                        className="absolute top-1/2 right-0 pr-3 flex items-center justify-center group"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeSlashIcon className="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                        ) : (
+                          <EyeIcon className="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                        )}
+                      </button>
+                     
+                    </div>
                   </div>
-                </div>
 
-                <div>
-                  <div className="relative">
-                    <Input
-                      label="Confirm Password"
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      name="confirmPassword"
-                      register={register}
-                      validation={{
-                        required: 'Please confirm your password',
-                        validate: (value) =>
-                          value === password || 'Passwords do not match'
-                      }}
-                      error={errors.confirmPassword?.message}
-                      placeholder="Confirm your password"
-                      className="input-field pr-12"
-                    />
-                    <button
-                      type="button"
-                      className="absolute top-1/2 right-0 pr-3 transform -translate-y-1/2 flex items-center justify-center group"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                      {showConfirmPassword ? (
-                        <EyeSlashIcon className="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                      ) : (
-                        <EyeIcon className="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                      )}
-                    </button>
+                  <div>
+                    <div className="relative">
+                      <Input
+                        label="Confirm Password"
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        name="confirmPassword"
+                        register={register}
+                        validation={{
+                          required: 'Please confirm your password',
+                          validate: (value) =>
+                            value === password || 'Passwords do not match'
+                        }}
+                        error={errors.confirmPassword?.message}
+                        placeholder="Confirm your password"
+                        className="input-field pr-12 mt-2"
+                      />
+                      <button
+                        type="button"
+                        className="absolute top-1/2 right-0 pr-3  flex items-center justify-center group"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      >
+                        {showConfirmPassword ? (
+                          <EyeSlashIcon className="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                        ) : (
+                          <EyeIcon className="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-start">
+              <div className="flex items-start mt-2">
                 <div className="flex items-center h-4">
                   <input
                     id="agree-terms"
@@ -317,7 +323,7 @@ const Register = () => {
               <div>
                 <Button
                   type="submit"
-                  className="w-full btn-primary text-base py-3"
+                  className="w-full btn-primary text-base py-3 mt-2 mb-2"
                   loading={loading}
                   disabled={loading}
                 >
@@ -326,7 +332,7 @@ const Register = () => {
               </div>
             </form>
 
-            <div className="mt-4">
+            <div className="mt-4 mb-2">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-200" />
@@ -336,7 +342,7 @@ const Register = () => {
                 </div>
               </div>
 
-              <div className="mt-3">
+              <div className="mt-3 mb-2">
                 <div id="google-signup-button" className="w-full"></div>
               </div>
             </div>
