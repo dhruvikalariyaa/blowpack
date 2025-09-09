@@ -126,63 +126,58 @@ const AddressForm = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col border border-white/30">
-        <div className="flex items-center justify-between p-6 border-b border-white/20 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 backdrop-blur-sm rounded-t-2xl">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+      <div className="bg-white/95 backdrop-blur-xl rounded-lg shadow-2xl border border-white/30 max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
-            <div className="p-3 bg-blue-500/20 backdrop-blur-sm rounded-xl border border-blue-200/30">
+            <div className="bg-blue-100 rounded-full p-3">
               <MapPinIcon className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-800">
+              <h2 className="text-2xl font-bold text-gray-900">
                 {address ? 'Edit Address' : 'Add New Address'}
               </h2>
-              <p className="text-sm text-gray-600">
+              <p className="text-gray-600">
                 {address ? 'Update your delivery address' : 'Add a new delivery address'}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white/50 backdrop-blur-sm rounded-lg transition-all duration-200 border border-transparent hover:border-white/20"
+            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
             disabled={loading}
           >
-            <XMarkIcon className="h-6 w-6" />
+            <XMarkIcon className="h-5 w-5" />
           </button>
         </div>
 
         {/* Scrollable Content Area */}
         <div className="flex-1 overflow-y-auto custom-scrollbar">
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <form onSubmit={handleSubmit} className="p-6 space-y-4">
 
           {/* Address */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Complete Address <span className="text-red-500">*</span>
             </label>
             <textarea
               name="address"
               value={formData.address}
               onChange={handleInputChange}
-              rows={3}
-              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 resize-none transition-all duration-200 backdrop-blur-sm ${
-                errors.address ? 'border-red-300/50 bg-red-50/50' : 'border-gray-200/50 bg-white/80 hover:border-gray-300/50'
-              }`}
+              rows={4}
+              className={`input-field resize-none ${errors.address ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''}`}
               placeholder="Enter complete address with street, area, landmark..."
               disabled={loading}
             />
             {errors.address && (
-              <p className="mt-2 text-sm text-red-600 flex items-center">
-                <span className="mr-1">⚠️</span>
-                {errors.address}
-              </p>
+              <p className="mt-1 text-sm text-red-600">{errors.address}</p>
             )}
           </div>
 
           {/* City and State */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 City <span className="text-red-500">*</span>
                 {formData.city && formData.pincode.length === 6 && (
                   <span className="ml-2 text-xs text-green-600">(Auto-filled)</span>
@@ -193,22 +188,17 @@ const AddressForm = ({
                 name="city"
                 value={formData.city}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 backdrop-blur-sm ${
-                  errors.city ? 'border-red-300/50 bg-red-50/50' : 'border-gray-200/50 bg-white/80 hover:border-gray-300/50'
-                }`}
+                className={`input-field ${errors.city ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''}`}
                 placeholder="Enter city"
                 disabled={loading}
               />
               {errors.city && (
-                <p className="mt-2 text-sm text-red-600 flex items-center">
-                  <span className="mr-1">⚠️</span>
-                  {errors.city}
-                </p>
+                <p className="mt-1 text-sm text-red-600">{errors.city}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 State <span className="text-red-500">*</span>
                 {formData.state && formData.pincode.length === 6 && (
                   <span className="ml-2 text-xs text-green-600">(Auto-filled)</span>
@@ -219,24 +209,19 @@ const AddressForm = ({
                 name="state"
                 value={formData.state}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 backdrop-blur-sm ${
-                  errors.state ? 'border-red-300/50 bg-red-50/50' : 'border-gray-200/50 bg-white/80 hover:border-gray-300/50'
-                }`}
+                className={`input-field ${errors.state ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''}`}
                 placeholder="Enter state"
                 disabled={loading}
               />
               {errors.state && (
-                <p className="mt-2 text-sm text-red-600 flex items-center">
-                  <span className="mr-1">⚠️</span>
-                  {errors.state}
-                </p>
+                <p className="mt-1 text-sm text-red-600">{errors.state}</p>
               )}
             </div>
           </div>
 
           {/* Pincode */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Pincode <span className="text-red-500">*</span>
               {pincodeLoading && (
                 <span className="ml-2 text-xs text-blue-600 flex items-center">
@@ -251,9 +236,7 @@ const AddressForm = ({
                 name="pincode"
                 value={formData.pincode}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 backdrop-blur-sm ${
-                  errors.pincode ? 'border-red-300/50 bg-red-50/50' : 'border-gray-200/50 bg-white/80 hover:border-gray-300/50'
-                }`}
+                className={`input-field ${errors.pincode ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''}`}
                 placeholder="Enter 6-digit pincode"
                 disabled={loading || pincodeLoading}
                 maxLength={6}
@@ -265,50 +248,48 @@ const AddressForm = ({
               )}
             </div>
             {errors.pincode && (
-              <p className="mt-2 text-sm text-red-600 flex items-center">
-                <span className="mr-1">⚠️</span>
-                {errors.pincode}
-              </p>
+              <p className="mt-1 text-sm text-red-600">{errors.pincode}</p>
             )}
             {formData.pincode.length === 6 && !pincodeLoading && formData.city && formData.state && (
-              <p className="mt-2 text-sm text-green-600 flex items-center">
-                <span className="mr-1">✓</span>
-                Auto-filled: {formData.city}, {formData.state}
+              <p className="mt-1 text-sm text-green-600">
+                ✓ Auto-filled: {formData.city}, {formData.state}
               </p>
             )}
           </div>
 
           {/* Default Address Checkbox */}
-          <div className="bg-gray-50/80 backdrop-blur-sm p-4 rounded-xl border border-gray-200/50">
-            <div className="flex items-center">
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <div className="flex items-start space-x-3">
               <input
                 type="checkbox"
                 id="isDefault"
                 name="isDefault"
                 checked={formData.isDefault}
                 onChange={handleInputChange}
-                className="h-5 w-5 text-blue-600 focus:ring-blue-500/50 border-gray-300 rounded-md bg-white"
+                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-0.5"
                 disabled={loading}
               />
-              <label htmlFor="isDefault" className="ml-3 block text-sm font-medium text-gray-700">
-                Set as default delivery address
-              </label>
+              <div className="flex-1">
+                <label htmlFor="isDefault" className="block text-sm font-medium text-gray-700 mb-1">
+                  Set as default delivery address
+                </label>
+                <p className="text-xs text-gray-600">
+                  This address will be used as the default for all new orders and will be pre-selected during checkout.
+                </p>
+              </div>
             </div>
-            <p className="mt-1 text-xs text-gray-500 ml-8">
-              This address will be used as the default for all new orders
-            </p>
           </div>
 
           </form>
         </div>
 
         {/* Fixed Action Buttons */}
-        <div className="flex justify-end space-x-3 p-6 border-t border-gray-200/50 bg-gray-50/50 backdrop-blur-sm rounded-b-2xl">
+        <div className="flex justify-end space-x-3 p-6 border-t border-gray-200">
           <button
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50 transition-all duration-200"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-all duration-200"
           >
             Cancel
           </button>
@@ -316,7 +297,7 @@ const AddressForm = ({
             type="submit"
             onClick={handleSubmit}
             disabled={loading}
-            className="px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-blue-600 border border-blue-400/30 rounded-xl hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50 flex items-center transition-all duration-200 shadow-lg"
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 flex items-center transition-all duration-200"
           >
             {loading ? (
               <>

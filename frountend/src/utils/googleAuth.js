@@ -77,11 +77,26 @@ const handleCredentialResponse = async (response) => {
   }
 };
 
+// Global promise to prevent multiple script loads
+let googleScriptPromise = null;
+
 // Function to load Google Sign-In script
 export const loadGoogleSignInScript = () => {
-  return new Promise((resolve, reject) => {
+  if (googleScriptPromise) {
+    return googleScriptPromise;
+  }
+
+  googleScriptPromise = new Promise((resolve, reject) => {
     if (window.google && window.google.accounts.id) {
       resolve();
+      return;
+    }
+
+    // Check if script is already being loaded
+    const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+    if (existingScript) {
+      existingScript.onload = () => resolve();
+      existingScript.onerror = () => reject(new Error('Failed to load Google Sign-In script'));
       return;
     }
 
@@ -93,10 +108,13 @@ export const loadGoogleSignInScript = () => {
       resolve();
     };
     script.onerror = () => {
+      googleScriptPromise = null; // Reset on error
       reject(new Error('Failed to load Google Sign-In script'));
     };
     document.head.appendChild(script);
   });
+
+  return googleScriptPromise;
 };
 
 // Function to sign out from Google

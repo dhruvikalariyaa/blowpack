@@ -7,8 +7,10 @@ import { toast } from 'react-toastify';
 // Components
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
-import LoadingSpinner from './components/common/LoadingSpinner';
+import LoadingSpinner, { AuthLoader, PageLoader } from './components/common/LoadingSpinner';
 import AdminRoute from './components/common/AdminRoute';
+import ProtectedRoute from './components/common/ProtectedRoute';
+import SmoothTransition from './components/common/SmoothTransition';
 import { ErrorBoundary } from './utils/errorHandler';
 
 // Pages
@@ -56,7 +58,7 @@ function App() {
   // Check if current route is an admin route
   const isAdminRoute = location.pathname.startsWith('/admin');
 
-  // Initialize app
+  // Initialize app - only run once
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -64,13 +66,13 @@ function App() {
     }
   }, [dispatch]);
 
-  // Load cart and wishlist if authenticated
+  // Load cart and wishlist if authenticated - only when authentication state changes
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && user) {
       dispatch(fetchCart());
       dispatch(fetchWishlist());
     }
-  }, [dispatch, isAuthenticated]);
+  }, [dispatch, isAuthenticated, user]);
 
   // Handle notifications
   useEffect(() => {
@@ -84,8 +86,9 @@ function App() {
     }
   }, [error, success, dispatch]);
 
-  if (loading) {
-    return <LoadingSpinner />;
+  // Show loading spinner during initial authentication check
+  if (loading && !isAuthenticated) {
+    return <AuthLoader text="Initializing..." />;
   }
 
   return (
@@ -100,44 +103,46 @@ function App() {
         {!isAdminRoute && <Navbar />}
         
         <main className="min-h-screen">
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Home />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/products/:id" element={<ProductDetail />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/terms-of-service" element={<TermsOfService />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            
-            {/* Auth Routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/auth/google-success" element={<GoogleSuccess />} />
-            
-            {/* Protected Routes */}
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/wishlist" element={<Wishlist />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/orders/:id" element={<OrderDetail />} />
-            <Route path="/orders/:orderId/review" element={<OrderReview />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/reviews" element={<UserReviews />} />
-            
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-            <Route path="/admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
-            <Route path="/admin/orders" element={<AdminRoute><AdminOrders /></AdminRoute>} />
-            <Route path="/admin/categories" element={<AdminRoute><AdminCategories /></AdminRoute>} />
-            <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
-            <Route path="/admin/reviews" element={<AdminRoute><AdminReviews /></AdminRoute>} />
-            
-            {/* 404 Route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <SmoothTransition>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/products/:id" element={<ProductDetail />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/terms-of-service" element={<TermsOfService />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              
+              {/* Auth Routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/auth/google-success" element={<GoogleSuccess />} />
+              
+              {/* Protected Routes */}
+              <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+              <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
+              <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+              <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+              <Route path="/orders/:id" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
+              <Route path="/orders/:orderId/review" element={<ProtectedRoute><OrderReview /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="/reviews" element={<ProtectedRoute><UserReviews /></ProtectedRoute>} />
+              
+              {/* Admin Routes */}
+              <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+              <Route path="/admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
+              <Route path="/admin/orders" element={<AdminRoute><AdminOrders /></AdminRoute>} />
+              <Route path="/admin/categories" element={<AdminRoute><AdminCategories /></AdminRoute>} />
+              <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+              <Route path="/admin/reviews" element={<AdminRoute><AdminReviews /></AdminRoute>} />
+              
+              {/* 404 Route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </SmoothTransition>
         </main>
 
         {/* Only show footer if not on admin routes */}

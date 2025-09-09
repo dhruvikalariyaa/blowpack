@@ -1,18 +1,39 @@
 import React from 'react';
+import PerfectLoader, { 
+  AuthLoader, 
+  PageLoader, 
+  ButtonLoader, 
+  CardLoader, 
+  ModalLoader 
+} from './PerfectLoader';
 
-const LoadingSpinner = ({ size = 'md', className = '' }) => {
-  const sizeClasses = {
-    sm: 'h-4 w-4',
-    md: 'h-8 w-8',
-    lg: 'h-12 w-12',
-    xl: 'h-16 w-16',
-  };
-
+const LoadingSpinner = ({ 
+  size = 'md', 
+  className = '', 
+  text = 'Loading...', 
+  showText = true,
+  variant = 'primary',
+  fullScreen = false 
+}) => {
   return (
-    <div className={`flex items-center justify-center ${className}`}>
-      <div className={`loading-spinner ${sizeClasses[size]}`}></div>
-    </div>
+    <PerfectLoader
+      size={size}
+      className={className}
+      text={text}
+      showText={showText}
+      variant={variant}
+      fullScreen={fullScreen}
+    />
   );
+};
+
+// Re-export all specialized loaders
+export { 
+  AuthLoader, 
+  PageLoader, 
+  ButtonLoader, 
+  CardLoader, 
+  ModalLoader 
 };
 
 export default LoadingSpinner;

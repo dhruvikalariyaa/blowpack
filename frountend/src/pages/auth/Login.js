@@ -8,7 +8,7 @@ import { loginUser, clearError, clearSuccess, googleAuth } from '../../store/sli
 import { loadGoogleSignInScript, initializeGoogleSignIn, renderGoogleSignInButton } from '../../utils/googleAuth';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
+import LoadingSpinner, { AuthLoader } from '../../components/common/LoadingSpinner';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -26,43 +26,49 @@ const Login = () => {
 
   const from = location.state?.from?.pathname || '/';
 
+  // Combined effect for authentication and cleanup
   useEffect(() => {
     if (isAuthenticated) {
       navigate(from, { replace: true });
     }
-  }, [isAuthenticated, navigate, from]);
-
-  useEffect(() => {
+    
     return () => {
       dispatch(clearError());
       dispatch(clearSuccess());
     };
-  }, [dispatch]);
+  }, [isAuthenticated, navigate, from, dispatch]);
 
-  // Initialize Google Sign-In
+  // Initialize Google Sign-In only once
   useEffect(() => {
+    let isMounted = true;
+    
     const initGoogleAuth = async () => {
       try {
         await loadGoogleSignInScript();
-        await initializeGoogleSignIn();
-        
-        // Render Google Sign-In button
-        renderGoogleSignInButton('google-signin-button', handleGoogleSuccess, handleGoogleError);
+        if (isMounted) {
+          await initializeGoogleSignIn();
+          renderGoogleSignInButton('google-signin-button', handleGoogleSuccess, handleGoogleError);
+        }
       } catch (error) {
         console.error('Failed to initialize Google Sign-In:', error);
-        // Show a message that Google OAuth is not configured
-        const buttonContainer = document.getElementById('google-signin-button');
-        if (buttonContainer) {
-          buttonContainer.innerHTML = `
-            <div class="w-full p-3 text-center text-sm text-gray-500 bg-gray-100 rounded-md border">
-              Google Sign-In is not configured. Please set up Google OAuth credentials.
-            </div>
-          `;
+        if (isMounted) {
+          const buttonContainer = document.getElementById('google-signin-button');
+          if (buttonContainer) {
+            buttonContainer.innerHTML = `
+              <div class="w-full p-3 text-center text-sm text-gray-500 bg-gray-100 rounded-md border">
+                Google Sign-In is not configured. Please set up Google OAuth credentials.
+              </div>
+            `;
+          }
         }
       }
     };
 
     initGoogleAuth();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleGoogleSuccess = async (userInfo, credential) => {
@@ -83,7 +89,7 @@ const Login = () => {
   };
 
   if (loading) {
-    return <LoadingSpinner size="xl" className="min-h-screen" />;
+    return <AuthLoader text="Signing you in..." />;
   }
 
   return (
