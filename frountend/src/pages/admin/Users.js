@@ -5,7 +5,9 @@ import {
   MagnifyingGlassIcon,
   EyeIcon,
   UserPlusIcon,
-  UserMinusIcon
+  UserMinusIcon,
+  XMarkIcon,
+  CheckIcon
 } from '@heroicons/react/24/outline';
 
 const AdminUsers = () => {
@@ -17,6 +19,7 @@ const AdminUsers = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
   const [selectedUser, setSelectedUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
@@ -50,6 +53,7 @@ const AdminUsers = () => {
       const data = await response.json();
       setUsers(data.data.users);
       setTotalPages(data.data.pagination.totalPages);
+      setTotalUsers(data.data.pagination.totalItems);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -122,24 +126,22 @@ const AdminUsers = () => {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-5">
           <h1 className="text-3xl font-bold text-gray-900">Users</h1>
-          <p className="mt-2 text-gray-600">Manage registered users</p>
-        </div>
+          </div>
 
         {/* Filters */}
-        <div className="bg-white shadow rounded-lg p-6 mb-6">
+        <div className="bg-white shadow rounded-lg p-3 mb-6">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
               <div className="relative">
-                <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
-                <input
+                 <input
                   type="text"
                   placeholder="Search users..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 w-full"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 />
               </div>
             </div>
@@ -149,7 +151,7 @@ const AdminUsers = () => {
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 <option value="all">All Roles</option>
                 <option value="user">User</option>
@@ -162,7 +164,7 @@ const AdminUsers = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
@@ -217,7 +219,21 @@ const AdminUsers = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
-                          <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                          {user.profileImage && user.profileImage.url ? (
+                            <img
+                              src={user.profileImage.url}
+                              alt={user.name}
+                              className="h-10 w-10 rounded-full object-cover border-2 border-gray-200"
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                              }}
+                            />
+                          ) : null}
+                          <div 
+                            className={`h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center ${user.profileImage && user.profileImage.url ? 'hidden' : 'flex'}`}
+                            style={{ display: (user.profileImage && user.profileImage.url) ? 'none' : 'flex' }}
+                          >
                             <span className="text-gray-600 font-medium text-sm">
                               {user.name?.charAt(0).toUpperCase()}
                             </span>
@@ -280,126 +296,220 @@ const AdminUsers = () => {
             </table>
           </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-              <div className="flex-1 flex justify-between sm:hidden">
-                <button
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                >
-                  Previous
-                </button>
-                <button
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                >
-                  Next
-                </button>
+        {/* Pagination */}
+        {totalPages >= 1 && (
+          <div className="bg-white px-4 py-3 flex items-center justify-between border border-gray-200 rounded-lg shadow-sm mt-6">
+            <div className="flex-1 flex justify-between sm:hidden">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm text-gray-700">
+                  Showing <span className="font-medium">{users.length}</span> of{' '}
+                  <span className="font-medium">{totalUsers || 0}</span> users
+                </p>
+                <p className="text-xs text-gray-500">
+                  Page <span className="font-medium">{currentPage}</span> of{' '}
+                  <span className="font-medium">{totalPages}</span>
+                </p>
               </div>
-              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm text-gray-700">
-                    Page <span className="font-medium">{currentPage}</span> of{' '}
-                    <span className="font-medium">{totalPages}</span>
-                  </p>
-                </div>
-                <div>
-                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                    <button
-                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                      disabled={currentPage === 1}
-                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      Previous
-                    </button>
-                    <button
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                      disabled={currentPage === totalPages}
-                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      Next
-                    </button>
-                  </nav>
-                </div>
+              <div>
+                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    Previous
+                  </button>
+                  
+                  {/* Page Numbers */}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                    // Show first page, last page, current page, and pages around current page
+                    const shouldShow = 
+                      page === 1 || 
+                      page === totalPages || 
+                      (page >= currentPage - 1 && page <= currentPage + 1);
+                    
+                    if (!shouldShow) {
+                      // Show ellipsis for gaps
+                      if (page === 2 && currentPage > 4) {
+                        return (
+                          <span key={`ellipsis-${page}`} className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500">
+                            ...
+                          </span>
+                        );
+                      }
+                      if (page === totalPages - 1 && currentPage < totalPages - 3) {
+                        return (
+                          <span key={`ellipsis-${page}`} className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500">
+                            ...
+                          </span>
+                        );
+                      }
+                      return null;
+                    }
+                    
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`relative inline-flex items-center px-3 py-2 border text-sm font-medium ${
+                          page === currentPage
+                            ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  })}
+                  
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </nav>
               </div>
             </div>
-          )}
+          </div>
+        )}
         </div>
 
         {/* User Details Modal */}
         {showModal && selectedUser && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium text-gray-900">
-                  User Details - {selectedUser.name}
-                </h3>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+          <div className="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden">
+              {/* Header */}
+              <div className="bg-blue-100 px-6 py-4 text-gray-900">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-bold">User Details - {selectedUser.name}</h2>
+                    <p className="text-gray-900 text-sm">ID: {selectedUser._id.slice(-8)} • Joined: {formatDate(selectedUser.createdAt)}</p>
+                  </div>
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="p-2 hover:bg-blue-300 rounded-full transition-colors"
+                  >
+                    <XMarkIcon className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
 
-              <div className="space-y-6">
-                {/* User Info */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">Personal Information</h4>
-                    <div className="space-y-1 text-sm text-gray-600">
-                      <p><span className="font-medium">Name:</span> {selectedUser.name}</p>
-                      <p><span className="font-medium">Email:</span> {selectedUser.email}</p>
-                      <p><span className="font-medium">Phone:</span> {selectedUser.phone}</p>
-                      <p><span className="font-medium">User ID:</span> {selectedUser._id}</p>
+              {/* Content */}
+              <div className="p-6 space-y-6 overflow-y-auto max-h-[calc(85vh-100px)]">
+
+                {/* User Profile & Basic Info */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {/* Profile Picture & Basic Info */}
+                  <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
+                    <h3 className="text-sm font-semibold text-gray-600 mb-3">Profile Information</h3>
+                    <div className="flex items-center space-x-4 mb-4">
+                      <div className="relative">
+                        {selectedUser.profileImage && selectedUser.profileImage.url ? (
+                          <img
+                            src={selectedUser.profileImage.url}
+                            alt={selectedUser.name}
+                            className="h-16 w-16 rounded-full object-cover border-2 border-purple-200"
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              e.target.nextSibling.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div 
+                          className={`h-16 w-16 rounded-full bg-purple-200 flex items-center justify-center border-2 border-purple-200 ${selectedUser.profileImage && selectedUser.profileImage.url ? 'hidden' : 'flex'}`}
+                          style={{ display: (selectedUser.profileImage && selectedUser.profileImage.url) ? 'none' : 'flex' }}
+                        >
+                          <span className="text-purple-600 font-bold text-xl">
+                            {selectedUser.name?.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-semibold text-gray-700">{selectedUser.name}</h4>
+                        <p className="text-sm text-gray-500">{selectedUser.email}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Phone:</span>
+                        <span className="font-medium text-gray-700">{selectedUser.phone || 'Not provided'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Email Verified:</span>
+                        <span className={`font-medium ${selectedUser.emailVerified ? 'text-green-600' : 'text-red-600'}`}>
+                          {selectedUser.emailVerified ? 'Yes' : 'No'}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">Account Information</h4>
-                    <div className="space-y-1 text-sm text-gray-600">
-                      <p><span className="font-medium">Role:</span> 
-                        <span className={`ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(selectedUser.role)}`}>
+                  {/* Account Details */}
+                  <div className="bg-orange-50 rounded-xl p-4 border border-orange-200">
+                    <h3 className="text-sm font-semibold text-gray-600 mb-3">Account Details</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-500 text-sm">Role:</span>
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(selectedUser.role)}`}>
                           {selectedUser.role}
                         </span>
-                      </p>
-                      <p><span className="font-medium">Status:</span> 
-                        <span className={`ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(selectedUser.isActive)}`}>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-500 text-sm">Status:</span>
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(selectedUser.isActive)}`}>
                           {selectedUser.isActive ? 'Active' : 'Inactive'}
                         </span>
-                      </p>
-                      <p><span className="font-medium">Email Verified:</span> 
-                        <span className={`ml-2 ${selectedUser.emailVerified ? 'text-green-600' : 'text-red-600'}`}>
-                          {selectedUser.emailVerified ? 'Yes' : 'No'}
-                        </span>
-                      </p>
-                      <p><span className="font-medium">Joined:</span> {formatDate(selectedUser.createdAt)}</p>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-500 text-sm">User ID:</span>
+                        <span className="text-gray-700 text-xs font-mono">{selectedUser._id}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-500 text-sm">Joined:</span>
+                        <span className="text-gray-700 text-sm">{formatDate(selectedUser.createdAt)}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Addresses */}
                 {selectedUser.addresses && selectedUser.addresses.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">Addresses</h4>
+                  <div className="bg-pink-50 rounded-xl p-4 border border-pink-200">
+                    <h3 className="text-sm font-semibold text-gray-600 mb-3">Addresses ({selectedUser.addresses.length})</h3>
                     <div className="space-y-3">
                       {selectedUser.addresses.map((address, index) => (
-                        <div key={index} className="border rounded-lg p-3">
-                          <div className="text-sm text-gray-600">
-                            <p><span className="font-medium">Name:</span> {address.name}</p>
-                            <p><span className="font-medium">Phone:</span> {address.phone}</p>
-                            <p><span className="font-medium">Address:</span> {address.address}</p>
-                            <p><span className="font-medium">City:</span> {address.city}, {address.state} - {address.pincode}</p>
-                            {address.isDefault && (
-                              <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                                Default
-                              </span>
-                            )}
+                        <div key={index} className="bg-white rounded-lg p-3 border border-pink-100">
+                          <div className="flex items-start justify-between">
+                            <div className="space-y-1 text-sm">
+                              <div className="flex items-center space-x-2">
+                                <span className="font-medium text-gray-700">{address.name}</span>
+                                {address.isDefault && (
+                                  <span className="inline-flex px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                    Default
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-gray-600">{address.phone}</p>
+                              <p className="text-gray-600">{address.address}</p>
+                              <p className="text-gray-600">{address.city}, {address.state} - {address.pincode}</p>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -407,21 +517,22 @@ const AdminUsers = () => {
                   </div>
                 )}
 
+
                 {/* Actions */}
-                <div className="border-t pt-4">
-                  <div className="flex justify-end space-x-3">
+                
+                 <div className="flex justify-end space-x-3">
                     <button
                       onClick={() => toggleUserStatus(selectedUser._id, !selectedUser.isActive)}
-                      className={`px-4 py-2 rounded-md text-sm font-medium ${
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                         selectedUser.isActive
-                          ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                          : 'bg-green-100 text-green-700 hover:bg-green-200'
+                          ? 'bg-red-100 text-red-700 hover:bg-red-200 border border-red-200'
+                          : 'bg-green-100 text-green-700 hover:bg-green-200 border border-green-200'
                       }`}
                     >
                       {selectedUser.isActive ? 'Deactivate User' : 'Activate User'}
                     </button>
                   </div>
-                </div>
+                
               </div>
             </div>
           </div>

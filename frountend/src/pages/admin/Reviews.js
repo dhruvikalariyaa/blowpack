@@ -85,48 +85,125 @@ const AdminReviews = () => {
   };
 
   const renderPagination = () => {
-    if (!allReviews.pagination) return null;
+    if (!allReviews || !allReviews.pagination) {
+      console.log('No pagination data available:', allReviews);
+      return null;
+    }
 
-    const { currentPage: page, totalPages, hasNextPage, hasPrevPage } = allReviews.pagination;
-    const pages = [];
+    const { currentPage: page, totalPages, hasNextPage, hasPrevPage, totalItems } = allReviews.pagination;
+    const reviews = allReviews.reviews || [];
 
-    const startPage = Math.max(1, page - 2);
-    const endPage = Math.min(totalPages, page + 2);
+    console.log('Pagination data:', { page, totalPages, hasNextPage, hasPrevPage, totalItems, reviewsLength: reviews.length });
 
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
+    // Show pagination if there are reviews and pagination data
+    if (!totalPages || totalPages < 1) {
+      console.log('No total pages available');
+      // Show a simple pagination even for single page
+      if (reviews.length > 0) {
+        return (
+          <div className="bg-white px-4 py-3 flex items-center justify-between border border-gray-200 rounded-lg shadow-sm mt-6">
+            <div className="flex-1 flex justify-center">
+              <p className="text-sm text-gray-700">
+                Showing <span className="font-medium">{reviews.length}</span> reviews
+              </p>
+            </div>
+          </div>
+        );
+      }
+      return null;
     }
 
     return (
-      <div className="flex items-center justify-center space-x-2 mt-8">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => handlePageChange(page - 1)}
-          disabled={!hasPrevPage}
-        >
-          Previous
-        </Button>
-        
-        {pages.map(pageNum => (
-          <Button
-            key={pageNum}
-            variant={pageNum === page ? "primary" : "outline"}
-            size="sm"
-            onClick={() => handlePageChange(pageNum)}
+      <div className="bg-white px-4 py-3 flex items-center justify-between border border-gray-200 rounded-lg shadow-sm mt-6">
+        <div className="flex-1 flex justify-between sm:hidden">
+          <button
+            onClick={() => handlePageChange(page - 1)}
+            disabled={!hasPrevPage}
+            className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
           >
-            {pageNum}
-          </Button>
-        ))}
-        
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => handlePageChange(page + 1)}
-          disabled={!hasNextPage}
-        >
-          Next
-        </Button>
+            Previous
+          </button>
+          <button
+            onClick={() => handlePageChange(page + 1)}
+            disabled={!hasNextPage}
+            className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+        <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm text-gray-700">
+              Showing <span className="font-medium">{reviews.length}</span> of{' '}
+              <span className="font-medium">{totalItems || 0}</span> reviews
+            </p>
+            <p className="text-xs text-gray-500">
+              Page <span className="font-medium">{page}</span> of{' '}
+              <span className="font-medium">{totalPages}</span>
+            </p>
+          </div>
+          <div>
+            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+              <button
+                onClick={() => handlePageChange(page - 1)}
+                disabled={!hasPrevPage}
+                className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+              >
+                Previous
+              </button>
+              
+              {/* Page Numbers */}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+                // Show first page, last page, current page, and pages around current page
+                const shouldShow = 
+                  pageNum === 1 || 
+                  pageNum === totalPages || 
+                  (pageNum >= page - 1 && pageNum <= page + 1);
+                
+                if (!shouldShow) {
+                  // Show ellipsis for gaps
+                  if (pageNum === 2 && page > 4) {
+                    return (
+                      <span key={`ellipsis-${pageNum}`} className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500">
+                        ...
+                      </span>
+                    );
+                  }
+                  if (pageNum === totalPages - 1 && page < totalPages - 3) {
+                    return (
+                      <span key={`ellipsis-${pageNum}`} className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500">
+                        ...
+                      </span>
+                    );
+                  }
+                  return null;
+                }
+                
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`relative inline-flex items-center px-3 py-2 border text-sm font-medium ${
+                      pageNum === page
+                        ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                        : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              
+              <button
+                onClick={() => handlePageChange(page + 1)}
+                disabled={!hasNextPage}
+                className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+              >
+                Next
+              </button>
+            </nav>
+          </div>
+        </div>
       </div>
     );
   };
@@ -143,11 +220,10 @@ const AdminReviews = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Review Management</h1>
-          <p className="text-gray-600 mt-2">Manage and moderate customer reviews</p>
-        </div>
-
+          </div>
+ 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
+        <div className="bg-white rounded-lg shadow-sm border p-3 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -156,8 +232,8 @@ const AdminReviews = () => {
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
+                className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
                 <option value="">All Reviews</option>
                 <option value="approved">Approved</option>
                 <option value="pending">Pending</option>
@@ -171,8 +247,8 @@ const AdminReviews = () => {
               <select
                 value={filters.rating}
                 onChange={(e) => handleFilterChange('rating', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
+                className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
                 <option value="">All Ratings</option>
                 <option value="5">5 Stars</option>
                 <option value="4">4 Stars</option>
@@ -186,7 +262,8 @@ const AdminReviews = () => {
               <Button
                 onClick={() => setFilters({ status: '', rating: '' })}
                 variant="outline"
-                className="w-full"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                
               >
                 Clear Filters
               </Button>
@@ -300,10 +377,19 @@ const AdminReviews = () => {
               <p className="text-gray-500">No reviews found</p>
             </div>
           )}
-
-          {/* Pagination */}
-          {renderPagination()}
         </div>
+
+        {/* Pagination */}
+        {renderPagination()}
+        
+        {/* Fallback pagination if main pagination doesn't show */}
+        {!renderPagination() && allReviews?.reviews && allReviews.reviews.length > 0 && (
+          <div className="bg-white px-4 py-3 flex items-center justify-center border border-gray-200 rounded-lg shadow-sm mt-6">
+            <p className="text-sm text-gray-700">
+              Showing <span className="font-medium">{allReviews.reviews.length}</span> reviews
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

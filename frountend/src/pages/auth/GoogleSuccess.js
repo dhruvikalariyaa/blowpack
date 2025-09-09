@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet-async';
 import { getCurrentUser } from '../../store/slices/authSlice';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
@@ -10,6 +10,7 @@ const GoogleSuccess = () => {
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const handleGoogleAuthSuccess = async () => {
@@ -19,8 +20,13 @@ const GoogleSuccess = () => {
         
         // Get user data
         try {
-          await dispatch(getCurrentUser()).unwrap();
-          navigate('/', { replace: true });
+          const result = await dispatch(getCurrentUser()).unwrap();
+          // Redirect admin users to admin dashboard
+          if (result.user?.role === 'admin') {
+            navigate('/admin', { replace: true });
+          } else {
+            navigate('/', { replace: true });
+          }
         } catch (error) {
           console.error('Failed to get user data:', error);
           navigate('/login', { 

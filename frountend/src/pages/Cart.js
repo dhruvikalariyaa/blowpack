@@ -76,16 +76,7 @@ const Cart = () => {
     }
   };
 
-  const handleRefreshCart = async () => {
-    try {
-      // Clear any cached data
-      localStorage.removeItem('cart');
-      await dispatch(fetchCart());
-      toast.success('Cart refreshed successfully');
-    } catch (error) {
-      toast.error('Failed to refresh cart');
-    }
-  };
+ 
 
   if (!isAuthenticated) {
     return (
@@ -137,14 +128,7 @@ const Cart = () => {
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Your Cart</h1>
           <div className="flex space-x-2">
-            <Button 
-              variant="outline" 
-              onClick={handleRefreshCart}
-              className="text-sm"
-            >
-              Refresh Cart
-            </Button>
-            <Button variant="outline" onClick={handleClearCart}>
+            <Button variant="outline" className='bg-blue-500 text-white hover:bg-red-500 hover:text-white' onClick={handleClearCart}>
               Clear Cart
             </Button>
           </div>
@@ -295,7 +279,7 @@ const Cart = () => {
                   </Button>
                 </Link>
                 <Link to="/products" className="block">
-                  <Button variant="outline" className="w-full">
+                  <Button variant="outline" className="w-full hover:bg-blue-600 hover:text-white">
                     Continue Shopping
                   </Button>
                 </Link>

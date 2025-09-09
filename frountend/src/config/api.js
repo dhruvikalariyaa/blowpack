@@ -43,6 +43,9 @@ export const API_ENDPOINTS = {
   
   // Review endpoints
   REVIEWS: `${API_BASE_URL}/api/reviews`,
+  
+  // Contact endpoints
+  CONTACT: `${API_BASE_URL}/api/contact`,
 };
 
 export default API_BASE_URL;

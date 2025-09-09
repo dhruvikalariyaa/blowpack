@@ -83,48 +83,125 @@ const UserReviews = () => {
   };
 
   const renderPagination = () => {
-    if (!userReviews.pagination) return null;
+    if (!userReviews || !userReviews.pagination) {
+      console.log('No pagination data available:', userReviews);
+      return null;
+    }
 
-    const { currentPage: page, totalPages, hasNextPage, hasPrevPage } = userReviews.pagination;
-    const pages = [];
+    const { currentPage: page, totalPages, hasNextPage, hasPrevPage, totalItems } = userReviews.pagination;
+    const reviews = userReviews.reviews || [];
 
-    const startPage = Math.max(1, page - 2);
-    const endPage = Math.min(totalPages, page + 2);
+    console.log('Pagination data:', { page, totalPages, hasNextPage, hasPrevPage, totalItems, reviewsLength: reviews.length });
 
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
+    // Show pagination if there are reviews and pagination data
+    if (!totalPages || totalPages < 1) {
+      console.log('No total pages available');
+      // Show a simple pagination even for single page
+      if (reviews.length > 0) {
+        return (
+          <div className="bg-white px-4 py-3 flex items-center justify-between border border-gray-200 rounded-lg shadow-sm mt-6">
+            <div className="flex-1 flex justify-center">
+              <p className="text-sm text-gray-700">
+                Showing <span className="font-medium">{reviews.length}</span> reviews
+              </p>
+            </div>
+          </div>
+        );
+      }
+      return null;
     }
 
     return (
-      <div className="flex items-center justify-center space-x-2 mt-8">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => handlePageChange(page - 1)}
-          disabled={!hasPrevPage}
-        >
-          Previous
-        </Button>
-        
-        {pages.map(pageNum => (
-          <Button
-            key={pageNum}
-            variant={pageNum === page ? "primary" : "outline"}
-            size="sm"
-            onClick={() => handlePageChange(pageNum)}
+      <div className="bg-white px-4 py-3 flex items-center justify-between border border-gray-200 rounded-lg shadow-sm mt-6 ">
+        <div className="flex-1 flex justify-between sm:hidden">
+          <button
+            onClick={() => handlePageChange(page - 1)}
+            disabled={!hasPrevPage}
+            className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
           >
-            {pageNum}
-          </Button>
-        ))}
-        
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => handlePageChange(page + 1)}
-          disabled={!hasNextPage}
-        >
-          Next
-        </Button>
+            Previous
+          </button>
+          <button
+            onClick={() => handlePageChange(page + 1)}
+            disabled={!hasNextPage}
+            className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+        <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm text-gray-700">
+              Showing <span className="font-medium">{reviews.length}</span> of{' '}
+              <span className="font-medium">{totalItems || 0}</span> reviews
+            </p>
+            <p className="text-xs text-gray-500">
+              Page <span className="font-medium">{page}</span> of{' '}
+              <span className="font-medium">{totalPages}</span>
+            </p>
+          </div>
+          <div>
+            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+              <button
+                onClick={() => handlePageChange(page - 1)}
+                disabled={!hasPrevPage}
+                className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+              >
+                Previous
+              </button>
+              
+              {/* Page Numbers */}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+                // Show first page, last page, current page, and pages around current page
+                const shouldShow = 
+                  pageNum === 1 || 
+                  pageNum === totalPages || 
+                  (pageNum >= page - 1 && pageNum <= page + 1);
+                
+                if (!shouldShow) {
+                  // Show ellipsis for gaps
+                  if (pageNum === 2 && page > 4) {
+                    return (
+                      <span key={`ellipsis-${pageNum}`} className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500">
+                        ...
+                      </span>
+                    );
+                  }
+                  if (pageNum === totalPages - 1 && page < totalPages - 3) {
+                    return (
+                      <span key={`ellipsis-${pageNum}`} className="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500">
+                        ...
+                      </span>
+                    );
+                  }
+                  return null;
+                }
+                
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`relative inline-flex items-center px-3 py-2 border text-sm font-medium ${
+                      pageNum === page
+                        ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                        : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              
+              <button
+                onClick={() => handlePageChange(page + 1)}
+                disabled={!hasNextPage}
+                className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+              >
+                Next
+              </button>
+            </nav>
+          </div>
+        </div>
       </div>
     );
   };
@@ -141,12 +218,12 @@ const UserReviews = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 w-full">
       <Helmet>
         <title>My Reviews - Packwell Plastic Industries</title>
       </Helmet>
       
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">My Reviews</h1>
@@ -155,7 +232,7 @@ const UserReviews = () => {
 
         {/* Review Form Modal */}
         {showReviewForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 w-full">
             <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <ReviewForm
                 productId={editingReview?.product?._id}
@@ -291,10 +368,19 @@ const UserReviews = () => {
               </Button>
             </div>
           )}
-
-          {/* Pagination */}
-          {renderPagination()}
         </div>
+
+        {/* Pagination */}
+        {renderPagination()}
+        
+        {/* Fallback pagination if main pagination doesn't show */}
+        {!renderPagination() && userReviews?.reviews && userReviews.reviews.length > 0 && (
+          <div className="bg-white px-4 py-3 flex items-center justify-center border border-gray-200 rounded-lg shadow-sm mt-6">
+            <p className="text-sm text-gray-700">
+              Showing <span className="font-medium">{userReviews.reviews.length}</span> reviews
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

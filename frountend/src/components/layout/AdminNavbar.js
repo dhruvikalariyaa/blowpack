@@ -6,8 +6,9 @@ import {
   ShoppingBagIcon,
   ChartBarIcon,
   UsersIcon,
-  EyeIcon,
+  Squares2X2Icon,
   ChatBubbleLeftRightIcon,
+  EnvelopeIcon,
   ArrowRightOnRectangleIcon,
   UserIcon
 } from '@heroicons/react/24/outline';
@@ -40,8 +41,9 @@ const AdminNavbar = () => {
     { name: 'Products', href: '/admin/products', icon: ShoppingBagIcon },
     { name: 'Orders', href: '/admin/orders', icon: ChartBarIcon },
     { name: 'Users', href: '/admin/users', icon: UsersIcon },
-    { name: 'Categories', href: '/admin/categories', icon: EyeIcon },
+    { name: 'Categories', href: '/admin/categories', icon: Squares2X2Icon },
     { name: 'Reviews', href: '/admin/reviews', icon: ChatBubbleLeftRightIcon },
+    { name: 'Contacts', href: '/admin/contacts', icon: EnvelopeIcon },
   ];
 
   const handleLogout = () => {
@@ -62,16 +64,24 @@ const AdminNavbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo - Same as main navbar */}
-          <Link to="/admin" className="flex items-center">
+          <Link to="/" className="flex items-center group">
             <div className="flex-shrink-0 flex items-center">
               <img 
                 src="/logo.png" 
                 alt="Blow Pack Plastic" 
-                className="h-10 w-auto mr-3"
+                className="h-10 w-10 mr-1 group-hover:scale-105 transition-transform duration-300"
               />
-              <h1 className="text-2xl font-bold text-primary-600">
-                Blow Pack Plastic
-              </h1>
+              <div className="flex flex-col">
+                <h1 className="text-lg font-bold text-blue-600 group-hover:text-blue-700 transition-colors leading-tight">
+                  Blow Pack
+                </h1>
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    Plastic Industries
+                  </span>
+                  <div className="h-0.5 w-16 bg-gradient-to-r from-blue-400 via-green-400 to-orange-400 rounded-full mt-1"></div>
+                </div>
+              </div>
             </div>
           </Link>
 
