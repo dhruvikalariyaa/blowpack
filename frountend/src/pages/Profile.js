@@ -322,62 +322,62 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 relative overflow-hidden">
       <Helmet>
         <title>My Profile - Packwell Plastic Industries</title>
       </Helmet>
       
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
-          </div>
+       
 
         {/* Error Alert */}
         {error && <ErrorAlert message={error} />}
 
         {/* Success Alert */}
         {success && (
-          <div className="mb-6 bg-green-50 border border-green-200 rounded-md p-4">
-            <div className="flex">
-              <CheckIcon className="h-5 w-5 text-green-400" />
+          <div className="mb-6 bg-green-50 border border-green-200 rounded-xl p-4 shadow-md animate-slideIn">
+            <div className="flex items-center">
+              <div className="p-2 bg-green-100 rounded-full">
+                <CheckIcon className="h-5 w-5 text-green-600" />
+              </div>
               <div className="ml-3">
-                <p className="text-sm font-medium text-green-800">{success}</p>
+                <p className="text-sm font-semibold text-green-800">{success}</p>
               </div>
             </div>
           </div>
         )}
 
         {/* Tab Navigation */}
-        <div className="mb-8">
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8">
+        <div className="mb-6">
+          <div className="bg-white rounded-xl p-1 shadow-lg border border-gray-200">
+            <nav className="flex space-x-1">
               <button
                 onClick={() => setActiveTab('profile')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                className={`flex-1 py-2 px-4 rounded-lg font-semibold text-sm transition-all duration-300 ${
                   activeTab === 'profile'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                 }`}
               >
-                <div className="flex items-center space-x-2">
-                  <UserIcon className="h-5 w-5" />
-                  <span>Profile Information</span>
+                <div className="flex items-center justify-center space-x-2">
+                  <UserIcon className="h-4 w-4" />
+                  <span>Profile</span>
                 </div>
               </button>
               <button
                 onClick={() => setActiveTab('addresses')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                className={`flex-1 py-2 px-4 rounded-lg font-semibold text-sm transition-all duration-300 ${
                   activeTab === 'addresses'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                 }`}
               >
-                <div className="flex items-center space-x-2">
-                  <MapPinIcon className="h-5 w-5" />
-                  <span>Delivery Addresses</span>
+                <div className="flex items-center justify-center space-x-2">
+                  <MapPinIcon className="h-4 w-4" />
+                  <span>Addresses</span>
                   {user?.addresses?.length > 0 && (
-                    <span className="bg-gray-100 text-gray-600 py-0.5 px-2 rounded-full text-xs">
+                    <span className="bg-white/20 text-white py-0.5 px-1.5 rounded-full text-xs font-bold">
                       {user.addresses.length}
                     </span>
                   )}
@@ -389,13 +389,13 @@ const Profile = () => {
 
         {/* Profile Tab */}
         {activeTab === 'profile' && (
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-6 py-8">
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden animate-slideIn">
+            <div className="p-6">
               {/* Profile Image Section */}
-              <div className="flex flex-col items-center mb-8">
-                <div className="relative">
+              <div className="flex flex-col items-center mb-6">
+                <div className="relative group">
                   <div 
-                    className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer group relative overflow-hidden"
+                    className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center cursor-pointer group relative overflow-hidden shadow-lg border-2 border-white"
                     onClick={!isUploading ? handleImageClick : undefined}
                   >
                     {imagePreview ? (
@@ -405,23 +405,23 @@ const Profile = () => {
                         className="w-full h-full object-cover rounded-full"
                       />
                     ) : (
-                      <UserIcon className="w-16 h-16 text-gray-400" />
+                      <UserIcon className="w-12 h-12 text-blue-400" />
                     )}
                     
                     {/* Upload Progress Overlay */}
                     {isUploading && (
-                      <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                      <div className="absolute inset-0 bg-black/60 flex items-center justify-center rounded-full">
                         <div className="text-center">
                           <LoadingSpinner size="sm" />
-                          <p className="text-white text-xs mt-2">{uploadProgress}%</p>
+                          <p className="text-white text-xs mt-1 font-semibold">{uploadProgress}%</p>
                         </div>
                       </div>
                     )}
                     
                     {/* Overlay */}
                     {!isUploading && (
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center">
-                        <CameraIcon className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                      <div className="absolute inset-0 bg-blue-500/0 group-hover:bg-blue-500/80 transition-all duration-300 flex items-center justify-center rounded-full">
+                        <CameraIcon className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-110" />
                       </div>
                     )}
                   </div>
@@ -430,10 +430,10 @@ const Profile = () => {
                   {imagePreview && !isUploading && (
                     <button
                       onClick={handleDeleteImage}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                      className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110"
                       disabled={loading}
                     >
-                      <XMarkIcon className="w-4 h-4" />
+                      <XMarkIcon className="w-3 h-3" />
                     </button>
                   )}
                 </div>
@@ -451,15 +451,16 @@ const Profile = () => {
                   <button
                     onClick={handleImageClick}
                     disabled={loading || isUploading}
-                    className="text-sm text-blue-600 hover:text-blue-500 font-medium disabled:opacity-50"
+                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:transform-none text-sm"
                   >
-                    {isUploading ? 'Uploading...' : (imagePreview ? 'Change Photo' : 'Add Photo')}
+                    <CameraIcon className="w-3 h-3 mr-1.5" />
+                    {isUploading ? 'Uploading...' : (imagePreview ? 'Change' : 'Add Photo')}
                   </button>
                   
                   {isUploading && (
-                    <div className="w-32 bg-gray-200 rounded-full h-1 mt-2">
+                    <div className="w-32 bg-gray-200 rounded-full h-1.5 mt-3 overflow-hidden">
                       <div 
-                        className="bg-blue-600 h-1 rounded-full transition-all duration-300"
+                        className="bg-blue-600 h-1.5 rounded-full transition-all duration-300 shadow-lg"
                         style={{ width: `${uploadProgress}%` }}
                       ></div>
                     </div>
@@ -469,13 +470,13 @@ const Profile = () => {
 
               {/* Profile Form */}
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Name Field */}
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="space-y-2">
+                    <label htmlFor="name" className="block text-sm font-semibold text-gray-800 mb-2">
                       Full Name
                     </label>
-                    <div className="relative">
+                    <div className="relative group">
                       <input
                         type="text"
                         id="name"
@@ -483,14 +484,14 @@ const Profile = () => {
                         value={formData.name}
                         onChange={handleInputChange}
                         disabled={!isEditing || loading}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        className="w-full px-3 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 disabled:cursor-not-allowed transition-all duration-300 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                         placeholder="Enter your full name"
                       />
                       {!isEditing && (
                         <button
                           type="button"
                           onClick={() => setIsEditing(true)}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors duration-200 p-1 rounded-lg hover:bg-blue-50"
                         >
                           <PencilIcon className="w-4 h-4" />
                         </button>
@@ -499,8 +500,8 @@ const Profile = () => {
                   </div>
 
                   {/* Email Field (Read-only) */}
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="block text-sm font-semibold text-gray-800 mb-2">
                       Email Address
                     </label>
                     <div className="relative">
@@ -509,35 +510,35 @@ const Profile = () => {
                         id="email"
                         value={user?.email || ''}
                         disabled
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed pr-20"
+                        className="w-full px-3 py-3 border-2 border-gray-200 rounded-xl shadow-sm bg-gray-50 cursor-not-allowed pr-20 transition-all duration-300"
                       />
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                         {user?.emailVerified ? (
-                          <div className="flex items-center space-x-1 text-green-600">
-                            <CheckCircleIcon className="h-4 w-4" />
-                            <span className="text-xs font-medium">Verified</span>
+                          <div className="flex items-center space-x-1 bg-green-100 px-2 py-1 rounded-full">
+                            <CheckCircleIcon className="h-3 w-3 text-green-600" />
+                            <span className="text-xs font-semibold text-green-700">Verified</span>
                           </div>
                         ) : (
-                          <div className="flex items-center space-x-1 text-orange-600">
-                            <ExclamationTriangleIcon className="h-4 w-4" />
-                            <span className="text-xs font-medium">Unverified</span>
+                          <div className="flex items-center space-x-1 bg-orange-100 px-2 py-1 rounded-full">
+                            <ExclamationTriangleIcon className="h-3 w-3 text-orange-600" />
+                            <span className="text-xs font-semibold text-orange-700">Unverified</span>
                           </div>
                         )}
                       </div>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
-                    
-                    {/* Email Verification Status */}
+                     {/* Email Verification Status */}
                     {!user?.emailVerified && (
-                      <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-md">
-                        <div className="flex items-start">
-                          <ExclamationTriangleIcon className="h-5 w-5 text-orange-400 mt-0.5 mr-3 flex-shrink-0" />
+                      <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-xl">
+                        <div className="flex items-start space-x-2">
+                          <div className="p-1.5 bg-orange-100 rounded-full flex-shrink-0">
+                            <ExclamationTriangleIcon className="h-4 w-4 text-orange-600" />
+                          </div>
                           <div className="flex-1">
-                            <h4 className="text-sm font-medium text-orange-800 mb-1">
+                            <h4 className="text-xs font-semibold text-orange-800 mb-1">
                               Email Not Verified
                             </h4>
-                            <p className="text-xs text-orange-700 mb-3">
-                              Please verify your email address to receive important updates about your orders and ensure account security.
+                            <p className="text-xs text-orange-700 mb-3 leading-relaxed">
+                              Please verify your email address to receive important updates about your orders.
                             </p>
                             <button
                               type="button"
@@ -545,7 +546,7 @@ const Profile = () => {
                                 setShouldResetModal(true);
                                 setIsEmailVerificationOpen(true);
                               }}
-                              className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                              className="inline-flex items-center px-3 py-1.5 bg-orange-500 text-white text-xs font-semibold rounded-lg hover:bg-orange-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                             >
                               <EnvelopeIcon className="h-3 w-3 mr-1" />
                               Verify Now
@@ -555,29 +556,14 @@ const Profile = () => {
                       </div>
                     )}
                     
-                    {user?.emailVerified && (
-                      <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-md">
-                        <div className="flex items-center">
-                          <CheckCircleIcon className="h-5 w-5 text-green-400 mr-3" />
-                          <div>
-                            <h4 className="text-sm font-medium text-green-800">
-                              Email Verified
-                            </h4>
-                            <p className="text-xs text-green-700">
-                              Your email is verified. You'll receive important updates about your orders.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
                   </div>
 
                   {/* Phone Field */}
-                  <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="space-y-2">
+                    <label htmlFor="phone" className="block text-sm font-semibold text-gray-800 mb-2">
                       Phone Number
                     </label>
-                    <div className="relative">
+                    <div className="relative group">
                       <input
                         type="tel"
                         id="phone"
@@ -585,14 +571,14 @@ const Profile = () => {
                         value={formData.phone}
                         onChange={handleInputChange}
                         disabled={!isEditing || loading}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        className="w-full px-3 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 disabled:bg-gray-50 disabled:cursor-not-allowed transition-all duration-300 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                         placeholder="Enter your phone number"
                       />
                       {!isEditing && (
                         <button
                           type="button"
                           onClick={() => setIsEditing(true)}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors duration-200 p-1 rounded-lg hover:bg-blue-50"
                         >
                           <PencilIcon className="w-4 h-4" />
                         </button>
@@ -601,23 +587,39 @@ const Profile = () => {
                   </div>
 
                   {/* Role Field (Read-only) */}
-                  <div>
-                    <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="space-y-2">
+                    <label htmlFor="role" className="block text-sm font-semibold text-gray-800 mb-2">
                       Account Type
                     </label>
-                    <input
-                      type="text"
-                      id="role"
-                      value={user?.role === 'admin' ? 'Administrator' : 'Customer'}
-                      disabled
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed"
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        id="role"
+                        value={user?.role === 'admin' ? 'Administrator' : 'Customer'}
+                        disabled
+                        className="w-full px-3 py-3 border-2 border-gray-200 rounded-xl shadow-sm bg-gray-50 cursor-not-allowed transition-all duration-300"
+                      />
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${
+                          user?.role === 'admin' 
+                            ? 'bg-purple-100 text-purple-700' 
+                            : 'bg-blue-100 text-blue-700'
+                        }`}>
+                          <div className={`w-1.5 h-1.5 rounded-full ${
+                            user?.role === 'admin' ? 'bg-purple-500' : 'bg-blue-500'
+                          }`}></div>
+                          <span className="text-xs font-semibold">
+                            {user?.role === 'admin' ? 'Admin' : 'Customer'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
                 {/* Action Buttons */}
                 {isEditing && (
-                  <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                  <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200/50">
                     <button
                       type="button"
                       onClick={() => {
@@ -628,14 +630,14 @@ const Profile = () => {
                         });
                       }}
                       disabled={loading}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                      className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border-2 border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500/20 disabled:opacity-50 transition-all duration-300 shadow-md hover:shadow-lg"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={loading}
-                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 flex items-center"
+                      className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30 disabled:opacity-50 flex items-center transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                     >
                       {loading ? (
                         <>
@@ -658,24 +660,25 @@ const Profile = () => {
 
         {/* Addresses Tab */}
         {activeTab === 'addresses' && (
-          <div className="space-y-6">
+          <div className="space-y-6 animate-slideIn">
             {/* Add Address Button */}
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-lg font-medium text-gray-900">Delivery Addresses</h2>
-                </div>
+                <h2 className="text-xl font-bold text-gray-900">Delivery Addresses</h2>
+                <p className="text-gray-600 text-sm">Manage your delivery locations</p>
+              </div>
               <button
                 onClick={handleAddAddress}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-sm"
               >
-                <PlusIcon className="h-4 w-4 mr-2" />
+                <PlusIcon className="h-4 w-4 mr-1.5" />
                 Add Address
               </button>
             </div>
 
             {/* Addresses List */}
             {user?.addresses && user.addresses.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {user.addresses.map((address) => (
                   <AddressCard
                     key={address._id}
@@ -690,16 +693,18 @@ const Profile = () => {
               </div>
             ) : (
               <div className="text-center py-12">
-                <HomeIcon className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No addresses</h3>
-                <p className="mt-1 text-sm text-gray-500">Get started by adding a new delivery address.</p>
-                <div className="mt-6">
+                <div className="bg-white rounded-2xl p-8 shadow-xl border border-gray-200">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+                    <HomeIcon className="h-8 w-8 text-blue-400" />
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">No addresses yet</h3>
+                  <p className="text-gray-600 mb-6 max-w-sm mx-auto text-sm">Get started by adding your first delivery address to make ordering easier.</p>
                   <button
                     onClick={handleAddAddress}
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-sm"
                   >
                     <PlusIcon className="h-4 w-4 mr-2" />
-                    Add Address
+                    Add Your First Address
                   </button>
                 </div>
               </div>

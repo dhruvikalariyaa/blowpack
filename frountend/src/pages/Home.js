@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useCallback, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,24 +12,84 @@ import {
   BoltIcon
 } from '@heroicons/react/24/outline';
 import { fetchFeaturedProducts, fetchBestSellingProducts } from '../store/slices/productSlice';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import LoadingSpinner, { PageLoader } from '../components/common/LoadingSpinner';
 import Button from '../components/common/Button';
+
+// Memoized Product Card Component
+const ProductCard = memo(({ product, badge, badgeColor }) => (
+  <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 group relative">
+    {/* Badge */}
+    <div className="absolute top-2 left-2 z-10">
+      <span className={`${badgeColor} text-white text-xs font-bold px-2 py-1 rounded-full`}>
+        {badge}
+      </span>
+    </div>
+    
+    <div className="aspect-[4/3] bg-gray-50 overflow-hidden">
+      <img
+        src={product.images?.[0]?.url || '/placeholder-product.svg'}
+        alt={product.name}
+        className="w-full h-full object-contain bg-white p-2"
+        onError={(e) => {
+          e.target.src = '/placeholder-product.svg';
+        }}
+      />
+    </div>
+    <div className="p-4">
+      <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+        {product.name}
+      </h3>
+      <div className="flex items-center mb-2">
+        <div className="flex items-center">
+          {[...Array(5)].map((_, i) => (
+            <StarIcon
+              key={i}
+              className={`h-4 w-4 ${
+                i < Math.floor(product.ratings?.average || 0)
+                  ? 'text-yellow-400'
+                  : 'text-gray-300'
+              }`}
+              fill="currentColor"
+            />
+          ))}
+        </div>
+        <span className="ml-2 text-sm text-gray-600">
+          ({product.ratings?.count || 0})
+        </span>
+      </div>
+      
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <span className="text-2xl font-bold text-primary-600">
+            ₹{product.price}
+          </span>
+          {product.originalPrice && product.originalPrice > product.price && (
+            <span className="text-sm text-gray-500 line-through">
+              ₹{product.originalPrice}
+            </span>
+          )}
+        </div>
+        <Link
+          to={`/products/${product._id}`}
+          className="text-primary-600 hover:text-primary-700 font-medium text-sm"
+        >
+          View Details
+        </Link>
+      </div>
+    </div>
+  </div>
+));
 
 const Home = () => {
   const dispatch = useDispatch();
   const { featuredProducts, bestSellingProducts, loading: productsLoading } = useSelector((state) => state.products);
 
-  useEffect(() => {
-    dispatch(fetchFeaturedProducts({ limit: 8 }));
-    dispatch(fetchBestSellingProducts({ limit: 8 }));
-  }, [dispatch]);
-
-
-  const features = [
+  // Memoize the features array to prevent re-creation on every render
+  const features = useMemo(() => [
     {
-      icon: <BoltIcon className="h-8 w-8" />,   // 🔄 new icon
-      title: 'Fast Delivery',                  // 🔄 new title
-      description: 'Get your orders delivered quickly and safely' // 🔄 new desc
+      icon: <BoltIcon className="h-8 w-8" />,
+      title: 'Fast Delivery',
+      description: 'Get your orders delivered quickly and safely'
     },
     {
       icon: <ShieldCheckIcon className="h-8 w-8" />,
@@ -41,11 +101,19 @@ const Home = () => {
       title: 'Best Prices',
       description: 'Competitive pricing for all products'
     }
-  ];
+  ], []);
+
+  // Load products only once
+  useEffect(() => {
+    if (!featuredProducts?.length && !bestSellingProducts?.length) {
+      dispatch(fetchFeaturedProducts({ limit: 8 }));
+      dispatch(fetchBestSellingProducts({ limit: 8 }));
+    }
+  }, [dispatch, featuredProducts?.length, bestSellingProducts?.length]);
 
 
   if (productsLoading) {
-    return <LoadingSpinner size="xl" className="min-h-screen" />;
+    return <PageLoader text="Loading amazing products..." />;
   }
 
   return (
@@ -120,68 +188,12 @@ const Home = () => {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {bestSellingProducts?.map((product) => (
-              <div key={product._id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 group relative">
-                {/* Best Seller Badge */}
-                <div className="absolute top-2 left-2 z-10">
-                  <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                    🔥 Best Seller
-                  </span>
-                </div>
-                
-                <div className="aspect-[4/3] bg-gray-50 overflow-hidden">
-                  <img
-                    src={product.images?.[0]?.url || '/placeholder-product.svg'}
-                    alt={product.name}
-                    className="w-full h-full object-contain bg-white p-2"
-                    onError={(e) => {
-                      e.target.src = '/placeholder-product.svg';
-                    }}
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                    {product.name}
-                  </h3>
-                  <div className="flex items-center mb-2">
-                    <div className="flex items-center">
-                      {[...Array(5)].map((_, i) => (
-                        <StarIcon
-                          key={i}
-                          className={`h-4 w-4 ${
-                            i < Math.floor(product.ratings?.average || 0)
-                              ? 'text-yellow-400'
-                              : 'text-gray-300'
-                          }`}
-                          fill="currentColor"
-                        />
-                      ))}
-                    </div>
-                    <span className="ml-2 text-sm text-gray-600">
-                      ({product.ratings?.count || 0})
-                    </span>
-                  </div>
-                  
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-2xl font-bold text-primary-600">
-                        ₹{product.price}
-                      </span>
-                      {product.originalPrice && product.originalPrice > product.price && (
-                        <span className="text-sm text-gray-500 line-through">
-                          ₹{product.originalPrice}
-                        </span>
-                      )}
-                    </div>
-                    <Link
-                      to={`/products/${product._id}`}
-                      className="text-primary-600 hover:text-primary-700 font-medium text-sm"
-                    >
-                      View Details
-                    </Link>
-                  </div>
-                </div>
-              </div>
+              <ProductCard
+                key={product._id}
+                product={product}
+                badge="🔥 Best Seller"
+                badgeColor="bg-red-500"
+              />
             ))}
           </div>
           
@@ -210,66 +222,12 @@ const Home = () => {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredProducts?.map((product) => (
-              <div key={product._id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 group relative">
-                {/* Featured Badge */}
-                <div className="absolute top-2 left-2 z-10">
-                  <span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                    ⭐ Featured
-                  </span>
-                </div>
-                
-                <div className="aspect-[4/3] bg-gray-50 overflow-hidden">
-                  <img
-                    src={product.images?.[0]?.url || '/placeholder-product.svg'}
-                    alt={product.name}
-                    className="w-full h-full object-contain bg-white p-2"
-                    onError={(e) => {
-                      e.target.src = '/placeholder-product.svg';
-                    }}
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                    {product.name}
-                  </h3>
-                  <div className="flex items-center mb-2">
-                    <div className="flex items-center">
-                      {[...Array(5)].map((_, i) => (
-                        <StarIcon
-                          key={i}
-                          className={`h-4 w-4 ${
-                            i < Math.floor(product.ratings?.average || 0)
-                              ? 'text-yellow-400'
-                              : 'text-gray-300'
-                          }`}
-                          fill="currentColor"
-                        />
-                      ))}
-                    </div>
-                    <span className="ml-2 text-sm text-gray-600">
-                      ({product.ratings?.count || 0})
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-2xl font-bold text-primary-600">
-                        ₹{product.price}
-                      </span>
-                      {product.originalPrice && product.originalPrice > product.price && (
-                        <span className="text-sm text-gray-500 line-through">
-                          ₹{product.originalPrice}
-                        </span>
-                      )}
-                    </div>
-                    <Link
-                      to={`/products/${product._id}`}
-                      className="text-primary-600 hover:text-primary-700 font-medium text-sm"
-                    >
-                      View Details
-                    </Link>
-                  </div>
-                </div>
-              </div>
+              <ProductCard
+                key={product._id}
+                product={product}
+                badge="⭐ Featured"
+                badgeColor="bg-blue-500"
+              />
             ))}
           </div>
           

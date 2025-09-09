@@ -148,7 +148,7 @@ const IsolatedEmailModal = ({ isOpen, onClose, shouldReset = false }) => {
 
   return (
     <div 
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           // Clear localStorage when modal is closed
@@ -161,13 +161,13 @@ const IsolatedEmailModal = ({ isOpen, onClose, shouldReset = false }) => {
       }}
     >
       <div 
-        className="bg-white rounded-lg shadow-xl max-w-md w-full"
+        className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl max-w-md w-full border border-white/30"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200/50">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 rounded-full">
+            <div className="p-3 bg-blue-100/80 backdrop-blur-sm rounded-full shadow-lg border border-blue-200/50">
               <EnvelopeIcon className="h-6 w-6 text-blue-600" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900">
@@ -183,9 +183,9 @@ const IsolatedEmailModal = ({ isOpen, onClose, shouldReset = false }) => {
               setIsModalOpen(false);
               onClose();
             }}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white/60 backdrop-blur-sm rounded-lg transition-all duration-200 border border-transparent hover:border-white/30 shadow-lg hover:shadow-xl"
           >
-            <XMarkIcon className="h-6 w-6" />
+            <XMarkIcon className="h-5 w-5" />
           </button>
         </div>
 
@@ -202,13 +202,13 @@ const IsolatedEmailModal = ({ isOpen, onClose, shouldReset = false }) => {
               </p>
               
               {error && (
-                <div className="mb-4 bg-red-50 border border-red-200 rounded-md p-3">
+                <div className="mb-4 bg-red-50/80 backdrop-blur-sm border border-red-200/50 rounded-lg p-3 shadow-sm">
                   <p className="text-sm text-red-800">{error}</p>
                 </div>
               )}
 
               {success && (
-                <div className="mb-4 bg-green-50 border border-green-200 rounded-md p-3">
+                <div className="mb-4 bg-green-50/80 backdrop-blur-sm border border-green-200/50 rounded-lg p-3 shadow-sm">
                   <p className="text-sm text-green-800">{success}</p>
                 </div>
               )}
@@ -217,7 +217,7 @@ const IsolatedEmailModal = ({ isOpen, onClose, shouldReset = false }) => {
                 type="button"
                 onClick={handleSendCode}
                 disabled={isLoading}
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center mb-2"
+                className="w-full bg-blue-600 text-white py-3 px-4 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center mb-2 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
               >
                 {isLoading ? (
                   <>
@@ -241,13 +241,13 @@ const IsolatedEmailModal = ({ isOpen, onClose, shouldReset = false }) => {
               </p>
               
               {error && (
-                <div className="mb-4 bg-red-50 border border-red-200 rounded-md p-3">
+                <div className="mb-4 bg-red-50/80 backdrop-blur-sm border border-red-200/50 rounded-lg p-3 shadow-sm">
                   <p className="text-sm text-red-800">{error}</p>
                 </div>
               )}
 
               {success && (
-                <div className="mb-4 bg-green-50 border border-green-200 rounded-md p-3">
+                <div className="mb-4 bg-green-50/80 backdrop-blur-sm border border-green-200/50 rounded-lg p-3 shadow-sm">
                   <p className="text-sm text-green-800">{success}</p>
                 </div>
               )}
@@ -266,7 +266,7 @@ const IsolatedEmailModal = ({ isOpen, onClose, shouldReset = false }) => {
                       handleVerify();
                     }
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center text-lg tracking-widest"
+                  className="w-full px-4 py-3 border-2 border-gray-200/50 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-center text-lg tracking-widest bg-white/90 backdrop-blur-sm transition-all duration-300"
                   placeholder="000000"
                   maxLength={6}
                 />
@@ -276,7 +276,7 @@ const IsolatedEmailModal = ({ isOpen, onClose, shouldReset = false }) => {
                 type="button"
                 onClick={handleVerify}
                 disabled={otp.length !== 6 || isLoading}
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                className="w-full bg-blue-600 text-white py-3 px-4 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
               >
                 {isLoading ? (
                   <>
@@ -292,8 +292,8 @@ const IsolatedEmailModal = ({ isOpen, onClose, shouldReset = false }) => {
 
           {step === 'success' && (
             <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
-                <CheckCircleIcon className="h-6 w-6 text-green-600" />
+              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100/80 backdrop-blur-sm shadow-lg border border-green-200/50 mb-4">
+                <CheckCircleIcon className="h-8 w-8 text-green-600" />
               </div>
               <h4 className="text-lg font-medium text-gray-900 mb-2">
                 Email Verified Successfully!
