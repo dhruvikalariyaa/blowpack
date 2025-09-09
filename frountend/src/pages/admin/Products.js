@@ -36,7 +36,6 @@ const AdminProducts = () => {
     name: "",
     description: "",
     price: "",
-    stock: "",
     category: "",
     sku: "",
     isActive: true,
@@ -128,23 +127,70 @@ const AdminProducts = () => {
       formDataToSend.append("name", formData.name || "");
       formDataToSend.append("description", formData.description || "");
       formDataToSend.append("price", formData.price || "0");
-      formDataToSend.append("stock", formData.stock || "0");
       formDataToSend.append("category", formData.category || "");
       formDataToSend.append("sku", formData.sku || "");
       formDataToSend.append("isActive", formData.isActive.toString());
       formDataToSend.append("isFeatured", formData.isFeatured.toString());
 
-      // Add images if any
+      // Handle images for editing
       console.log('🖼️ Form images:', formData.images);
-      if (formData.images && formData.images.length > 0) {
+      if (editingProduct) {
+        // For editing, we need to handle image changes
         const newImages = formData.images.filter(img => img.isNew && img.file);
+        const existingImages = formData.images.filter(img => !img.isNew);
+        
         console.log('📤 New images to upload:', newImages.length);
-        newImages.forEach(image => {
-          console.log('📎 Appending image:', image.file.name, image.file.size, image.file.type);
-          formDataToSend.append("images", image.file);
-        });
+        console.log('🔄 Existing images to keep:', existingImages.length);
+        
+        // First, delete removed images
+        const originalImages = editingProduct.images || [];
+        const imagesToDelete = originalImages.filter(originalImg => 
+          !existingImages.some(existingImg => existingImg._id === originalImg._id)
+        );
+        
+        console.log('🗑️ Images to delete:', imagesToDelete.length);
+        
+        // Delete removed images
+        for (const imageToDelete of imagesToDelete) {
+          try {
+            const deleteResponse = await fetch(
+              `${API_ENDPOINTS.PRODUCT_BY_ID(editingProduct._id)}/images/${imageToDelete._id}`,
+              {
+                method: "DELETE",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+            
+            if (!deleteResponse.ok) {
+              console.warn('Failed to delete image:', imageToDelete._id);
+            }
+          } catch (err) {
+            console.warn('Error deleting image:', err);
+          }
+        }
+        
+        // Add new images to upload
+        if (newImages.length > 0) {
+          newImages.forEach(image => {
+            console.log('📎 Appending new image:', image.file.name, image.file.size, image.file.type);
+            formDataToSend.append("images", image.file);
+          });
+        }
       } else {
-        console.log('❌ No images to upload');
+        // For new products, just add new images
+        if (formData.images && formData.images.length > 0) {
+          const newImages = formData.images.filter(img => img.isNew && img.file);
+          console.log('📤 New images to upload:', newImages.length);
+          newImages.forEach(image => {
+            console.log('📎 Appending image:', image.file.name, image.file.size, image.file.type);
+            formDataToSend.append("images", image.file);
+          });
+        } else {
+          console.log('❌ No images to upload');
+        }
       }
 
       const response = await fetch(url, {
@@ -168,7 +214,6 @@ const AdminProducts = () => {
         name: "",
         description: "",
         price: "",
-        stock: "",
         category: "",
         sku: "",
         isActive: true,
@@ -204,8 +249,7 @@ const AdminProducts = () => {
       name: product.name,
       description: product.description,
       price: product.price,
-      stock: product.stock,
-      category: product.category._id,
+      category: product.category?._id || "",
       sku: product.sku,
       isActive: product.isActive,
       isFeatured: product.isFeatured,
@@ -258,7 +302,6 @@ const AdminProducts = () => {
       name: "",
       description: "",
       price: "",
-      stock: "",
       category: "",
       sku: "",
       isActive: true,
@@ -409,9 +452,6 @@ const AdminProducts = () => {
                     Price
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Stock
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -454,9 +494,6 @@ const AdminProducts = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       ₹{product.price}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {product.stock}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
@@ -641,20 +678,6 @@ const AdminProducts = () => {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Stock
-                    </label>
-
-                    <input
-                      type="number"
-                      name="stock"
-                      value={formData.stock}
-                      onChange={handleInputChange}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="Enter stock quantity"
-                    />
-                  </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
@@ -933,17 +956,6 @@ const AdminProducts = () => {
                           </p>
                         </div>
 
-                        <div className="bg-white rounded-lg p-4 shadow-sm text-center">
-                          <label className="block text-sm font-semibold text-gray-600 mb-2">
-                            Stock
-                          </label>
-
-                          <p className="text-3xl font-bold text-blue-600">
-                            {viewingProduct.stock}
-                          </p>
-
-                          <p className="text-sm text-gray-500">units</p>
-                        </div>
                       </div>
                     </div>
 

@@ -130,7 +130,7 @@ const cartSlice = createSlice({
       .addCase(fetchCart.fulfilled, (state, action) => {
         state.loading = false;
         state.cart = action.payload.cart;
-        state.count = action.payload.cart.totalItems;
+        state.count = action.payload.cart.items.length;
         state.error = null;
       })
       .addCase(fetchCart.rejected, (state, action) => {
@@ -145,7 +145,7 @@ const cartSlice = createSlice({
       .addCase(addToCart.fulfilled, (state, action) => {
         state.loading = false;
         state.cart = action.payload.cart;
-        state.count = action.payload.cart.totalItems;
+        state.count = action.payload.cart.items.length;
         state.success = 'Item added to cart successfully';
         state.error = null;
       })
@@ -159,9 +159,10 @@ const cartSlice = createSlice({
         state.error = null;
       })
       .addCase(updateCartItem.fulfilled, (state, action) => {
+        console.log('🔄 Cart slice - updateCartItem fulfilled:', action.payload);
         state.loading = false;
         state.cart = action.payload.cart;
-        state.count = action.payload.cart.totalItems;
+        state.count = action.payload.cart.items.length;
         state.success = 'Cart updated successfully';
         state.error = null;
       })
@@ -177,7 +178,7 @@ const cartSlice = createSlice({
       .addCase(removeFromCart.fulfilled, (state, action) => {
         state.loading = false;
         state.cart = action.payload.cart;
-        state.count = action.payload.cart.totalItems;
+        state.count = action.payload.cart.items.length;
         state.success = 'Item removed from cart successfully';
         state.error = null;
       })

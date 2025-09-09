@@ -18,7 +18,7 @@ router.post('/', authenticateToken, validateOrder, async (req, res) => {
 
     // Get user's cart
     const cart = await Cart.findOne({ user: req.user._id })
-      .populate('items.product', 'name price images stock isActive');
+      .populate('items.product', 'name price images isActive');
 
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({
@@ -54,7 +54,6 @@ router.post('/', authenticateToken, validateOrder, async (req, res) => {
       console.log('🔍 Order validation for product:', {
         name: product.name,
         isActive: product.isActive,
-        stock: product.stock,
         cartQuantity: cartItem.quantity
       });
       
@@ -67,13 +66,6 @@ router.post('/', authenticateToken, validateOrder, async (req, res) => {
         });
       }
 
-      // Check stock
-      if (product.stock < cartItem.quantity) {
-        return res.status(400).json({
-          success: false,
-          message: `Only ${product.stock} items available for "${product.name}"`
-        });
-      }
 
       const itemTotal = product.price * cartItem.quantity;
       subtotal += itemTotal;
@@ -117,13 +109,6 @@ router.post('/', authenticateToken, validateOrder, async (req, res) => {
       totalAmount: order.totalAmount
     });
 
-    // Update product stock
-    for (const cartItem of cart.items) {
-      await Product.findByIdAndUpdate(
-        cartItem.product._id,
-        { $inc: { stock: -cartItem.quantity } }
-      );
-    }
 
     // Clear cart
     cart.items = [];
@@ -286,13 +271,7 @@ router.put('/:id/cancel', authenticateToken, async (req, res) => {
     order.cancelledAt = new Date();
     order.cancellationReason = reason || 'Cancelled by customer';
 
-    // Restore product stock
-    for (const item of order.items) {
-      await Product.findByIdAndUpdate(
-        item.product,
-        { $inc: { stock: item.quantity } }
-      );
-    }
+    // Note: Stock management removed as requested
 
     await order.save();
 
@@ -435,13 +414,7 @@ router.put('/:id/status', authenticateToken, requireAdmin, async (req, res) => {
       order.cancelledAt = new Date();
       order.cancellationReason = req.body.cancellationReason || 'Cancelled by admin';
       
-      // Restore product stock
-      for (const item of order.items) {
-        await Product.findByIdAndUpdate(
-          item.product,
-          { $inc: { stock: item.quantity } }
-        );
-      }
+      // Note: Stock management removed as requested
     }
 
     await order.save();

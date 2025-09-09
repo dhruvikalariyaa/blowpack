@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const Product = require('../models/Product');
 const Category = require('../models/Category');
+const Order = require('../models/Order');
 const { authenticateToken, requireAdmin, optionalAuth } = require('../middleware/auth');
 const { validatePagination, validateProduct } = require('../middleware/validation');
 const { uploadImage, uploadMultipleImages, deleteImage } = require('../utils/cloudinary');
@@ -54,10 +55,6 @@ router.get('/', validatePagination, optionalAuth, async (req, res) => {
       query.$text = { $search: req.query.search };
     }
 
-    // Stock filter
-    if (req.query.inStock === 'true') {
-      query.stock = { $gt: 0 };
-    }
 
     // Featured filter
     if (req.query.featured === 'true') {
@@ -163,6 +160,109 @@ router.get('/featured', async (req, res) => {
   }
 });
 
+// @route   GET /api/products/bestsellers
+// @desc    Get best selling products
+// @access  Public
+router.get('/bestsellers', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 8;
+
+    // Get best selling products based on order history
+    const bestSellingProducts = await Order.aggregate([
+      { $unwind: '$items' },
+      { 
+        $group: { 
+          _id: '$items.product', 
+          totalSold: { $sum: '$items.quantity' },
+          totalRevenue: { $sum: { $multiply: ['$items.price', '$items.quantity'] } }
+        } 
+      },
+      { $sort: { totalSold: -1 } },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: 'products',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'product'
+        }
+      },
+      { $unwind: '$product' },
+      { $match: { 'product.isActive': true } },
+      { $project: { 
+        product: 1,
+        totalSold: 1,
+        totalRevenue: 1
+      }}
+    ]);
+
+    // If we don't have enough best sellers, fill with featured products first, then other products
+    if (bestSellingProducts.length < limit) {
+      const usedProductIds = bestSellingProducts.map(item => item._id);
+      
+      // First try to fill with featured products
+      const featuredProducts = await Product.find({ 
+        isActive: true, 
+        isFeatured: true,
+        _id: { $nin: usedProductIds }
+      })
+        .populate('category', 'name slug')
+        .sort({ 'ratings.average': -1, createdAt: -1 })
+        .limit(limit - bestSellingProducts.length)
+        .select('-__v');
+
+      // Add featured products to the result
+      featuredProducts.forEach(product => {
+        bestSellingProducts.push({
+          product,
+          totalSold: 0,
+          totalRevenue: 0
+        });
+        usedProductIds.push(product._id);
+      });
+
+      // If still not enough, fill with other active products
+      if (bestSellingProducts.length < limit) {
+        const remainingProducts = await Product.find({ 
+          isActive: true,
+          _id: { $nin: usedProductIds }
+        })
+          .populate('category', 'name slug')
+          .sort({ 'ratings.average': -1, createdAt: -1 })
+          .limit(limit - bestSellingProducts.length)
+          .select('-__v');
+
+        // Add remaining products to the result
+        remainingProducts.forEach(product => {
+          bestSellingProducts.push({
+            product,
+            totalSold: 0,
+            totalRevenue: 0
+          });
+        });
+      }
+    }
+
+    res.json({
+      success: true,
+      data: {
+        products: bestSellingProducts.map(item => ({
+          ...item.product,
+          totalSold: item.totalSold,
+          totalRevenue: item.totalRevenue
+        }))
+      }
+    });
+  } catch (error) {
+    console.error('Get best selling products error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get best selling products',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
+});
+
 // @route   GET /api/products/:id
 // @desc    Get single product
 // @access  Public
@@ -223,7 +323,6 @@ router.post('/', authenticateToken, requireAdmin, upload.array('images', 5), val
       name: req.body.name || '',
       description: req.body.description || '',
       price: parseFloat(req.body.price) || 0,
-      stock: parseInt(req.body.stock) || 0,
       category: req.body.category || '',
       sku: req.body.sku || '',
       isActive: req.body.isActive === 'true',
@@ -309,7 +408,6 @@ router.put('/:id', authenticateToken, requireAdmin, upload.array('images', 5), v
     const updateData = {
       ...req.body,
       ...(req.body.price && { price: parseFloat(req.body.price) || 0 }),
-      ...(req.body.stock && { stock: parseInt(req.body.stock) || 0 }),
       ...(req.body.isActive !== undefined && { isActive: req.body.isActive === 'true' }),
       ...(req.body.isFeatured !== undefined && { isFeatured: req.body.isFeatured === 'true' })
     };

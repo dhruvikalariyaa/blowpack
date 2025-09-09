@@ -30,6 +30,8 @@ import ResetPassword from './pages/auth/ResetPassword';
 import GoogleSuccess from './pages/auth/GoogleSuccess';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import TermsOfService from './pages/TermsOfService';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import NotFound from './pages/NotFound';
 
 // Admin Pages
@@ -105,6 +107,8 @@ function App() {
             <Route path="/products/:id" element={<ProductDetail />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             
             {/* Auth Routes */}
             <Route path="/login" element={<Login />} />

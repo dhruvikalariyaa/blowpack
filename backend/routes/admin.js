@@ -31,7 +31,7 @@ router.get('/dashboard', async (req, res) => {
     const totalProducts = await Product.countDocuments();
     const activeProducts = await Product.countDocuments({ isActive: true });
     const featuredProducts = await Product.countDocuments({ isFeatured: true });
-    const outOfStockProducts = await Product.countDocuments({ stock: 0 });
+    // Note: Stock field removed as requested
 
     // Order statistics
     const totalOrders = await Order.countDocuments();
@@ -99,8 +99,7 @@ router.get('/dashboard', async (req, res) => {
         products: {
           total: totalProducts,
           active: activeProducts,
-          featured: featuredProducts,
-          outOfStock: outOfStockProducts
+          featured: featuredProducts
         },
         orders: {
           total: totalOrders,
@@ -260,12 +259,6 @@ router.get('/products', validatePagination, async (req, res) => {
       query.isFeatured = req.query.featured === 'true';
     }
 
-    // Stock filter
-    if (req.query.stock === 'out') {
-      query.stock = 0;
-    } else if (req.query.stock === 'low') {
-      query.stock = { $gt: 0, $lte: 10 };
-    }
 
     const products = await Product.find(query)
       .populate('category', 'name slug')

@@ -11,7 +11,7 @@ const router = express.Router();
 router.get('/', authenticateToken, async (req, res) => {
   try {
     let cart = await Cart.findOne({ user: req.user._id })
-      .populate('items.product', 'name price images stock ratings isActive');
+      .populate('items.product', 'name price images ratings isActive');
 
     if (!cart) {
       cart = new Cart({ user: req.user._id, items: [] });
@@ -32,7 +32,7 @@ router.get('/', authenticateToken, async (req, res) => {
     
     const freshProductData = await Product.find({ 
       _id: { $in: productIds } 
-    }).select('name price images stock ratings isActive isFeatured');
+    }).select('name price images ratings isActive isFeatured');
     
     // Create a map for quick lookup
     const productMap = new Map();
@@ -81,7 +81,6 @@ router.get('/', authenticateToken, async (req, res) => {
           name: item.product.name,
           price: item.product.price,
           images: item.product.images,
-          stock: item.product.stock,
           ratings: item.product.ratings,
           isActive: item.product.isActive,
           isFeatured: item.product.isFeatured
@@ -136,13 +135,6 @@ router.post('/add', authenticateToken, async (req, res) => {
       });
     }
 
-    // Check stock availability
-    if (product.stock < quantity) {
-      return res.status(400).json({
-        success: false,
-        message: `Only ${product.stock} items available in stock`
-      });
-    }
 
     // Get or create cart
     let cart = await Cart.findOne({ user: req.user._id });
@@ -160,12 +152,6 @@ router.post('/add', authenticateToken, async (req, res) => {
       // Update quantity
       const newQuantity = cart.items[existingItemIndex].quantity + quantity;
       
-      if (newQuantity > product.stock) {
-        return res.status(400).json({
-          success: false,
-          message: `Only ${product.stock} items available in stock`
-        });
-      }
 
       cart.items[existingItemIndex].quantity = newQuantity;
       cart.items[existingItemIndex].price = product.price;
@@ -181,7 +167,7 @@ router.post('/add', authenticateToken, async (req, res) => {
     await cart.save();
 
     const populatedCart = await Cart.findById(cart._id)
-      .populate('items.product', 'name price images stock ratings isActive');
+      .populate('items.product', 'name price images ratings isActive');
 
     res.json({
       success: true,
@@ -206,8 +192,11 @@ router.post('/add', authenticateToken, async (req, res) => {
 router.put('/update', authenticateToken, async (req, res) => {
   try {
     const { productId, quantity } = req.body;
+    
+    console.log('🔄 Cart update request:', { productId, quantity, userId: req.user._id });
 
     if (!productId || quantity === undefined) {
+      console.log('❌ Missing required fields');
       return res.status(400).json({
         success: false,
         message: 'Product ID and quantity are required'
@@ -215,6 +204,7 @@ router.put('/update', authenticateToken, async (req, res) => {
     }
 
     if (quantity < 1) {
+      console.log('❌ Invalid quantity:', quantity);
       return res.status(400).json({
         success: false,
         message: 'Quantity must be at least 1'
@@ -231,13 +221,6 @@ router.put('/update', authenticateToken, async (req, res) => {
       });
     }
 
-    // Check stock availability
-    if (product.stock < quantity) {
-      return res.status(400).json({
-        success: false,
-        message: `Only ${product.stock} items available in stock`
-      });
-    }
 
     // Get cart
     const cart = await Cart.findOne({ user: req.user._id });
@@ -261,13 +244,20 @@ router.put('/update', authenticateToken, async (req, res) => {
       });
     }
 
+    console.log('📝 Updating cart item:', { 
+      itemIndex, 
+      oldQuantity: cart.items[itemIndex].quantity, 
+      newQuantity: quantity 
+    });
+    
     cart.items[itemIndex].quantity = quantity;
     cart.items[itemIndex].price = product.price;
 
     await cart.save();
+    console.log('✅ Cart saved successfully');
 
     const populatedCart = await Cart.findById(cart._id)
-      .populate('items.product', 'name price images stock ratings isActive');
+      .populate('items.product', 'name price images ratings isActive');
 
     res.json({
       success: true,
@@ -318,7 +308,7 @@ router.delete('/remove', authenticateToken, async (req, res) => {
     await cart.save();
 
     const populatedCart = await Cart.findById(cart._id)
-      .populate('items.product', 'name price images stock ratings isActive');
+      .populate('items.product', 'name price images ratings isActive');
 
     res.json({
       success: true,

@@ -40,12 +40,6 @@ const productSchema = new mongoose.Schema({
     url: String,
     alt: String
   }],
-  stock: {
-    type: Number,
-    required: [true, 'Stock quantity is required'],
-    min: [0, 'Stock cannot be negative'],
-    default: 0
-  },
   sku: {
     type: String,
     unique: true,

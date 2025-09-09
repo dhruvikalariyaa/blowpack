@@ -32,7 +32,6 @@ const Cart = () => {
         items: cart.items.map(item => ({
           name: item.product?.name,
           isActive: item.product?.isActive,
-          stock: item.product?.stock,
           quantity: item.quantity
         }))
       });
@@ -42,9 +41,19 @@ const Cart = () => {
   const handleQuantityChange = async (productId, newQuantity) => {
     if (newQuantity < 1) return;
     
+    console.log('🔄 Updating quantity:', { productId, newQuantity });
+    
     try {
-      await dispatch(updateCartItem({ productId, quantity: newQuantity }));
+      const result = await dispatch(updateCartItem({ productId, quantity: newQuantity }));
+      console.log('✅ Quantity update result:', result);
+      
+      if (result.type.endsWith('/rejected')) {
+        toast.error('Failed to update quantity');
+      } else {
+        toast.success('Quantity updated successfully');
+      }
     } catch (error) {
+      console.error('❌ Quantity update error:', error);
       toast.error('Failed to update quantity');
     }
   };
@@ -150,7 +159,6 @@ const Cart = () => {
                 name: item.product?.name,
                 isActive: item.product?.isActive,
                 isActiveType: typeof item.product?.isActive,
-                stock: item.product?.stock
               });
               
               // Check if product is active (handle undefined case)
@@ -186,9 +194,6 @@ const Cart = () => {
                       <span className="text-lg font-bold text-primary-600">
                         ₹{item.price}
                       </span>
-                      <span className="text-sm text-gray-500">
-                        Stock: {item.product.stock}
-                      </span>
                       {!isProductActive && (
                         <span className="text-sm text-red-600 font-medium">
                           No longer available
@@ -206,13 +211,29 @@ const Cart = () => {
                       >
                         <MinusIcon className="h-4 w-4" />
                       </button>
-                      <span className="px-4 py-2 border-x border-gray-300 min-w-[3rem] text-center">
-                        {item.quantity}
-                      </span>
+                      <input
+                        type="number"
+                        min="1"
+                        value={item.quantity}
+                        onChange={(e) => {
+                          const newQuantity = parseInt(e.target.value) || 1;
+                          if (newQuantity >= 1) {
+                            handleQuantityChange(item.product._id, newQuantity);
+                          }
+                        }}
+                        onBlur={(e) => {
+                          const newQuantity = parseInt(e.target.value) || 1;
+                          if (newQuantity < 1) {
+                            handleQuantityChange(item.product._id, 1);
+                          }
+                        }}
+                        className="px-4 py-2 border-x border-gray-300 min-w-[3rem] text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                        disabled={!isProductActive}
+                      />
                       <button
                         onClick={() => handleQuantityChange(item.product._id, item.quantity + 1)}
                         className="p-2 hover:bg-gray-100"
-                        disabled={item.quantity >= item.product.stock || !isProductActive}
+                        disabled={!isProductActive}
                       >
                         <PlusIcon className="h-4 w-4" />
                       </button>

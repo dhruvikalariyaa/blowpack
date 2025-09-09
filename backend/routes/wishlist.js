@@ -11,7 +11,7 @@ const router = express.Router();
 router.get('/', authenticateToken, async (req, res) => {
   try {
     let wishlist = await Wishlist.findOne({ user: req.user._id })
-      .populate('products', 'name price images stock ratings category');
+      .populate('products', 'name price images ratings category');
 
     if (!wishlist) {
       wishlist = new Wishlist({ user: req.user._id, products: [] });
@@ -82,7 +82,7 @@ router.post('/add', authenticateToken, async (req, res) => {
     await wishlist.save();
 
     const populatedWishlist = await Wishlist.findById(wishlist._id)
-      .populate('products', 'name price images stock ratings category');
+      .populate('products', 'name price images ratings category');
 
     res.json({
       success: true,
@@ -142,7 +142,7 @@ router.delete('/remove', authenticateToken, async (req, res) => {
     await wishlist.save();
 
     const populatedWishlist = await Wishlist.findById(wishlist._id)
-      .populate('products', 'name price images stock ratings category');
+      .populate('products', 'name price images ratings category');
 
     res.json({
       success: true,
@@ -273,13 +273,7 @@ router.post('/move-to-cart', authenticateToken, async (req, res) => {
       });
     }
 
-    // Check stock availability
-    if (product.stock < 1) {
-      return res.status(400).json({
-        success: false,
-        message: 'Product is out of stock'
-      });
-    }
+    // Note: Stock check removed as requested
 
     // Add to cart (using cart logic)
     const Cart = require('../models/Cart');
@@ -312,7 +306,7 @@ router.post('/move-to-cart', authenticateToken, async (req, res) => {
     await wishlist.save();
 
     const populatedWishlist = await Wishlist.findById(wishlist._id)
-      .populate('products', 'name price images stock ratings category');
+      .populate('products', 'name price images ratings category');
 
     res.json({
       success: true,
